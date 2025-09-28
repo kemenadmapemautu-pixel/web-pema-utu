@@ -51,7 +51,7 @@ const cabinetMembers: CabinetMember[] = [
   },
   {
     id: "minister-education",
-    name: "Rizki Pratama",
+    name: "Putra Rahmat",
     position: "Menteri Pendidikan",
     faculty: "Fakultas Keguruan",
     department: "Pendidikan Matematika",
