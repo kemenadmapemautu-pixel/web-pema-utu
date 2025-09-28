@@ -38,7 +38,7 @@ export function Footer() {
               <li><Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth">Kemahasiswaan</Link></li>
               <li><Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth">Teknologi</Link></li>
               <li><Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth">Kewirausahaan</Link></li>
-              <li><Link to="/activities" className="text-sm text-white/80 hover:text-gold transition-smooth">Kegiatan</Link></li>
+              <li><Link to="/activities" className="text-sm text-white/80 hover:text-gold transition-smooth">Lainnya</Link></li>
             </ul>
           </div>
 
