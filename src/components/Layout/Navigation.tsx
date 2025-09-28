@@ -22,7 +22,7 @@ const navItems = [{
   path: "/programs",
   icon: Briefcase
 }, {
-  name: "Berita",
+  name: "Warta Pema",
   path: "/news",
   icon: FileText
 }, {
