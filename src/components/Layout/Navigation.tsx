@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Home, Users, Target, Briefcase, FileText, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import pemaLogo from "@/assets/new-pema-logo.png";
+import pemaLogo from "@/assets/pema-logo.png";
 import kabinetLogo from "@/assets/kabinet-logo.png";
 const navItems = [{
   name: "Beranda",
