@@ -3,33 +3,25 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroImage from "@/assets/hero-illustration.png";
-
 export default function Home() {
-  const highlights = [
-    {
-      icon: Target,
-      title: "Visi Jelas",
-      description: "Mewujudkan mahasiswa yang berkarakter dan berprestasi"
-    },
-    {
-      icon: Users,
-      title: "Tim Solid",
-      description: "Kabinet yang kompak dengan komitmen tinggi"
-    },
-    {
-      icon: Briefcase,
-      title: "Program Terbaik",
-      description: "Inovasi program kerja untuk kemajuan kampus"
-    },
-    {
-      icon: Star,
-      title: "Prestasi Nyata",
-      description: "Hasil kerja yang terukur dan berdampak positif"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen">
+  const highlights = [{
+    icon: Target,
+    title: "Visi Jelas",
+    description: "Mewujudkan mahasiswa yang berkarakter dan berprestasi"
+  }, {
+    icon: Users,
+    title: "Tim Solid",
+    description: "Kabinet yang kompak dengan komitmen tinggi"
+  }, {
+    icon: Briefcase,
+    title: "Program Terbaik",
+    description: "Inovasi program kerja untuk kemajuan kampus"
+  }, {
+    icon: Star,
+    title: "Prestasi Nyata",
+    description: "Hasil kerja yang terukur dan berdampak positif"
+  }];
+  return <div className="min-h-screen">
       {/* Hero Section */}
       <section className="gradient-hero text-white py-20 lg:py-32 relative overflow-hidden">
         <div className="container mx-auto px-4">
@@ -66,11 +58,7 @@ export default function Home() {
             </div>
             
             <div className="lg:order-2 animate-float">
-              <img 
-                src={heroImage} 
-                alt="3D illustration representing digital innovation and connectivity" 
-                className="w-full h-auto max-w-lg mx-auto"
-              />
+              <img src={heroImage} alt="3D illustration representing digital innovation and connectivity" className="w-full h-auto max-w-lg mx-auto" />
             </div>
           </div>
         </div>
@@ -94,9 +82,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {highlights.map((highlight, index) => {
-              const Icon = highlight.icon;
-              return (
-                <Card key={index} className="text-center p-6 shadow-card hover:shadow-primary transition-smooth group">
+            const Icon = highlight.icon;
+            return <Card key={index} className="text-center p-6 shadow-card hover:shadow-primary transition-smooth group">
                   <CardContent className="space-y-4">
                     <div className="w-16 h-16 gradient-primary rounded-xl flex items-center justify-center mx-auto group-hover:animate-bounce">
                       <Icon className="h-8 w-8 text-white" />
@@ -106,9 +93,8 @@ export default function Home() {
                       <p className="text-muted-foreground text-sm leading-relaxed">{highlight.description}</p>
                     </div>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -157,7 +143,7 @@ export default function Home() {
                 <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center mx-auto">
                   <Star className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-primary">Berita</h3>
+                <h3 className="text-xl font-semibold text-primary">Warta Pema</h3>
                 <p className="text-muted-foreground">Ikuti berita dan kegiatan terbaru kami</p>
                 <Button asChild className="w-full" variant="outline">
                   <Link to="/news">Baca Berita</Link>
@@ -167,6 +153,5 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 }
