@@ -1,9 +1,7 @@
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-
 export function Footer() {
-  return (
-    <footer className="gradient-primary text-white">
+  return <footer className="gradient-primary text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Description */}
@@ -17,9 +15,8 @@ export function Footer() {
                 <div className="text-gold text-sm">Kabinet Samgrahita</div>
               </div>
             </div>
-            <p className="text-sm text-white/80 leading-relaxed">
-              Samgrahita: Satu Visi, Seribu Aksi. Membangun masa depan universitas yang lebih baik melalui kolaborasi dan inovasi.
-            </p>
+            <p className="text-sm text-white/80 leading-relaxed">VISI
+"Mewujudkan kepemimpinan  mahasiswa yang responsif, aspiratif, dan berintegritas sebagai mitra strategis dalam menciptakan lingkungan kampus yang inovatif, inklusif, serta berdaya saing tinggi" </p>
           </div>
 
           {/* Quick Links */}
@@ -92,6 +89,5 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
