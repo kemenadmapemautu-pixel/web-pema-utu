@@ -15,8 +15,7 @@ export function Footer() {
                 <div className="text-gold text-sm">Kabinet Samgrahita</div>
               </div>
             </div>
-            <p className="text-sm text-white/80 leading-relaxed">VISI
-"Mewujudkan kepemimpinan  mahasiswa yang responsif, aspiratif, dan berintegritas sebagai mitra strategis dalam menciptakan lingkungan kampus yang inovatif, inklusif, serta berdaya saing tinggi" </p>
+            <p className="text-sm text-white/80 leading-relaxed">Mewujudkan kepemimpinan  mahasiswa yang responsif, aspiratif, dan berintegritas sebagai mitra strategis dalam menciptakan lingkungan kampus yang inovatif, inklusif, serta berdaya saing tinggi </p>
           </div>
 
           {/* Quick Links */}
@@ -83,8 +82,8 @@ export function Footer() {
               © 2024 PEMA UTU. All Kabinet Reserved.
             </p>
             <div className="flex space-x-6 text-sm text-white/60">
-              <Link to="/privacy" className="hover:text-gold transition-smooth">Kebijakan Privasi</Link>
-              <Link to="/terms" className="hover:text-gold transition-smooth">Syarat & Ketentuan</Link>
+              
+              
             </div>
           </div>
         </div>
