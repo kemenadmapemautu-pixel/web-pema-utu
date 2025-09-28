@@ -36,10 +36,7 @@ export default function Home() {
                 <p className="text-xl lg:text-2xl font-semibold text-gold">
                   Samgrahita: Satu Visi, Seribu Aksi
                 </p>
-                <p className="text-lg text-white/80 leading-relaxed max-w-md">
-                  Aamiin paminta Bataka I certar pam dakimi aen lou snotid es kaliaan nita-
-                  pamandang teskem dekutu nembom seribu batenas.
-                </p>
+                <p className="text-lg text-white/80 leading-relaxed max-w-md">Mewujudkan kepemimpinan  mahasiswa yang responsif, aspiratif, dan berintegritas sebagai mitra strategis dalam menciptakan lingkungan kampus yang inovatif, inklusif, serta berdaya saing tinggi </p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
