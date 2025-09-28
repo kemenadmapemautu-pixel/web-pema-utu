@@ -40,10 +40,10 @@ export function Navigation() {
           <Link to="/" className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <img src={pemaLogo} alt="PEMA UTU Logo" className="w-10 h-10 object-contain" />
-              <img src={kabinetLogo} alt="Kabinet Samgrahita Logo" className="w-10 h-10 object-contain" />
+              <img src={kabinetLogo} alt="Kabinet Samgrahita Logo" className="w-10 h-10 shadow-blue-100 " />
             </div>
             <div className="hidden sm:block">
-              <div className="text-lg font-bold text-primary">PEMA UTU</div>
+              <div className="text-gold-light font-bold text-primary rounded-bl-sm">PEMA UTU</div>
               <div className="text-xs text-gold">Kabinet Samgrahita</div>
             </div>
           </Link>

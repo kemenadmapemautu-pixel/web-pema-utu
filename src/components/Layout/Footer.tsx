@@ -32,7 +32,7 @@ export function Footer() {
 
           {/* Programs */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gold">Program Unggulan</h3>
+            <h3 className="text-lg font-semibold text-gold">Program Kerja</h3>
             <ul className="space-y-2">
               <li><Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth">Pendidikan</Link></li>
               <li><Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth">Kemahasiswaan</Link></li>
@@ -52,7 +52,7 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-gold" />
-                <span className="text-sm text-white/80">+62 812-3456-7890</span>
+                <span className="text-sm text-white/80">+62 000-0000-0000</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-gold" />
@@ -78,9 +78,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/20">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-white/60">
-              © 2024 PEMA UTU. All Kabinet Reserved.
-            </p>
+            <p className="text-sm text-white/60">© 2024 Pemerintahan Mahasiswa Universitas Teuku Umar. All Kabinet Reserved.</p>
             <div className="flex space-x-6 text-sm text-white/60">
               
               
