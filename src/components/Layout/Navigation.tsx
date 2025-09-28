@@ -43,7 +43,7 @@ export function Navigation() {
               <img src={kabinetLogo} alt="Kabinet Samgrahita Logo" className="w-10 h-10 shadow-blue-100 " />
             </div>
             <div className="hidden sm:block">
-              <div className="text-gold-light font-bold text-primary rounded-bl-sm">PEMA UTU</div>
+              <div className="text-gold-light font-bold text-primary-dark text-primary-dark \n">PEMA UTU</div>
               <div className="text-xs text-gold">Kabinet Samgrahita</div>
             </div>
           </Link>
