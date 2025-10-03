@@ -7,8 +7,18 @@ export function Footer() {
           {/* Logo & Description */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center">
-                <span className="text-primary font-bold text-xl">P</span>
+              <div className="w-16 h-16 flex items-center justify-center bg-white/10 rounded-lg">
+                <img 
+                  src="/pema-logo.png" 
+                  alt="Logo PEMA UTU" 
+                  className="w-full h-full object-contain rounded-lg"
+                  onError={(e) => {
+                    // Fallback jika gambar gagal load
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    target.parentElement!.innerHTML = '<span class="text-gold font-bold text-2xl">PEMA</span>';
+                  }}
+                />
               </div>
               <div>
                 <div className="text-xl font-bold">PEMA UTU</div>

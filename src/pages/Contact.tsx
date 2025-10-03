@@ -1,11 +1,21 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Users, Calendar } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Users, Calendar, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  date: string;
+  status: "unread" | "read" | "replied";
+}
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -14,16 +24,93 @@ export default function Contact() {
     subject: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const saveToLocalStorage = (messageData: ContactMessage) => {
+    const existingMessages = localStorage.getItem("contactMessages");
+    const messages: ContactMessage[] = existingMessages ? JSON.parse(existingMessages) : [];
+    messages.unshift(messageData); // Add to beginning
+    localStorage.setItem("contactMessages", JSON.stringify(messages));
+  };
+
+  const sendEmailJS = async (messageData: ContactMessage) => {
+    // EmailJS integration - uncomment setelah setup EmailJS
+    try {
+      // Konfigurasi EmailJS (ganti dengan data Anda)
+      const EMAILJS_SERVICE_ID = "your_service_id";
+      const EMAILJS_TEMPLATE_ID = "your_template_id"; 
+      const EMAILJS_PUBLIC_KEY = "your_public_key";
+      
+      // Uncomment untuk mengaktifkan EmailJS
+      /*
+      const emailjs = (await import('emailjs-com')).default;
+      
+      const templateParams = {
+        from_name: messageData.name,
+        from_email: messageData.email,
+        subject: messageData.subject,
+        message: messageData.message,
+        to_email: "admin@pemautu.org" // Email admin
+      };
+      
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+      */
+      
+      console.log("EmailJS ready for configuration:", messageData);
+      return true;
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    toast({
-      title: "Pesan Terkirim!",
-      description: "Terima kasih atas pesan Anda. Tim kami akan segera merespons."
-    });
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      // Create message object
+      const messageData: ContactMessage = {
+        id: Date.now().toString(),
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        date: new Date().toISOString(),
+        status: "unread"
+      };
+
+      // Save to localStorage
+      saveToLocalStorage(messageData);
+
+      // Try to send email (optional - won't fail if EmailJS not configured)
+      await sendEmailJS(messageData);
+
+      // Success notification
+      toast({
+        title: "Pesan Berhasil Dikirim! ✅",
+        description: "Pesan Anda telah tersimpan dan akan segera ditanggapi oleh tim kami."
+      });
+
+      // Reset form
+      setFormData({ name: "", email: "", subject: "", message: "" });
+
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Gagal Mengirim Pesan",
+        description: "Terjadi kesalahan. Silakan coba lagi atau hubungi kami via WhatsApp.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,6 +118,16 @@ export default function Contact() {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  const handleWhatsAppContact = () => {
+    const phoneNumber = "6281234567890"; // Ganti dengan nomor WhatsApp admin
+    const message = formData.name && formData.subject 
+      ? `Halo, saya ${formData.name}. ${formData.subject}: ${formData.message}`
+      : "Halo, saya ingin menghubungi PEMA UTU.";
+    
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const contactInfo = [
@@ -49,7 +146,7 @@ export default function Contact() {
     {
       icon: MapPin,
       title: "Alamat",
-      details: ["Sekretariat PEMA UTU", "Gedung Student Center, Lantai 2", "Universitas Teuku Umar"],
+      details: ["Sekretariat PEMA UTU", "Gedung Lama, Samping Paud/Tk Lentera Teuku Umar", "Universitas Teuku Umar"],
       description: "Kunjungi sekretariat kami di kampus"
     },
     {
@@ -157,10 +254,37 @@ export default function Contact() {
                     />
                   </div>
                   
-                  <Button type="submit" size="lg" className="w-full">
-                    <Send className="h-5 w-5 mr-2" />
-                    Kirim Pesan
-                  </Button>
+                  <div className="space-y-3">
+                    <Button 
+                      type="submit" 
+                      size="lg" 
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      <Send className="h-5 w-5 mr-2" />
+                      {isSubmitting ? "Mengirim..." : "Kirim Pesan"}
+                    </Button>
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">atau</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="lg" 
+                      className="w-full text-green-600 border-green-600 hover:bg-green-50"
+                      onClick={handleWhatsAppContact}
+                    >
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      Hubungi via WhatsApp
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -239,13 +363,22 @@ export default function Contact() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <MapPin className="h-12 w-12 text-gold mx-auto" />
-                  <p className="text-lg font-semibold text-primary">Sekretariat PEMA UTU</p>
-                  <p className="text-muted-foreground">Gedung Student Center, Lantai 2</p>
-                  <p className="text-muted-foreground">Universitas Teuku Umar</p>
-                </div>
+              <div className="rounded-lg overflow-hidden">
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d850.9414585443968!2d96.19604689715011!3d4.146114999718282!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNMKwMDgnNDYuMCJOIDk2wrAxMSc0OC4yIkU!5e1!3m2!1sid!2sid!4v1759434209312!5m2!1sid!2sid" 
+                  width="100%" 
+                  height="450" 
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Lokasi Sekretariat Pema UTU"
+                ></iframe>
+              </div>
+              <div className="mt-4 text-center space-y-2">
+                <p className="text-lg font-semibold text-primary">Sekretariat Pema UTU</p>
+                <p className="text-muted-foreground">Gedung Lama, Samping Paud/Tk Lentera Teuku Umar</p>
+                <p className="text-muted-foreground">Universitas Teuku Umar</p>
               </div>
             </CardContent>
           </Card>

@@ -23,7 +23,7 @@ interface Division {
 const structureData: Division[] = [
   {
     id: "leadership",
-    name: "Pimpinan Kabinet",
+    name: "Pengurus Inti",
     head: {
       name: "Ahmad Fauzi Rahman",
       position: "Presiden Mahasiswa",

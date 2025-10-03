@@ -1,126 +1,110 @@
-import { BookOpen, Users, Lightbulb, Trophy, Heart, Globe } from "lucide-react";
+import { useState, useEffect } from "react";
+import { BookOpen, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 interface Program {
   id: string;
-  title: string;
-  description: string;
-  category: string;
-  status: "active" | "planned" | "completed";
-  impact: string;
-  timeline: string;
-  participants: string;
+  nama: string;
+  deskripsi: string;
+  status: "sudah_terlaksana" | "belum_terlaksana" | "sedang_berjalan";
+  createdAt: string;
+  publishedDate?: string;
+  publishedBy?: string;
 }
 
-const programs: Program[] = [
-  {
-    id: "1",
-    title: "UTU Learning Hub",
-    description: "Platform digital untuk berbagi materi pembelajaran, tutorial, dan sumber daya akademik antar mahasiswa dari berbagai jurusan.",
-    category: "education",
-    status: "active",
-    impact: "500+ mahasiswa terdaftar",
-    timeline: "Januari - Desember 2024",
-    participants: "Semua mahasiswa UTU"
-  },
-  {
-    id: "2",
-    title: "Mentor-Mentee Program",
-    description: "Program bimbingan akademik dan personal development yang menghubungkan mahasiswa senior dengan junior.",
-    category: "education",
-    status: "active",
-    impact: "200 pasang mentor-mentee",
-    timeline: "Februari - November 2024",
-    participants: "Mahasiswa tahun 1-4"
-  },
-  {
-    id: "3",
-    title: "Startup Incubator UTU",
-    description: "Program inkubasi bisnis untuk mahasiswa yang memiliki ide kewirausahaan dengan mentoring dan funding support.",
-    category: "entrepreneurship",
-    status: "planned",
-    impact: "Target 20 startup baru",
-    timeline: "Maret - Desember 2024",
-    participants: "Mahasiswa dengan ide bisnis"
-  },
-  {
-    id: "4",
-    title: "Community Service Week",
-    description: "Program pengabdian masyarakat rutin yang melibatkan seluruh mahasiswa untuk berkontribusi pada masyarakat sekitar.",
-    category: "social",
-    status: "completed",
-    impact: "15 desa terdampak",
-    timeline: "Februari 2024",
-    participants: "1000+ mahasiswa"
-  },
-  {
-    id: "5",
-    title: "Tech Innovation Competition",
-    description: "Kompetisi tahunan untuk mengembangkan solusi teknologi inovatif yang dapat memecahkan masalah sosial.",
-    category: "technology",
-    status: "planned",
-    impact: "Target 100 tim peserta",
-    timeline: "September - November 2024",
-    participants: "Tim mahasiswa teknik"
-  },
-  {
-    id: "6",
-    title: "Mental Health Awareness",
-    description: "Program kesehatan mental yang menyediakan konseling, workshop, dan support group untuk mahasiswa.",
-    category: "wellness",
-    status: "active",
-    impact: "300+ mahasiswa terlayani",
-    timeline: "Januari - Desember 2024",
-    participants: "Seluruh mahasiswa UTU"
-  }
-];
-
-const categories = [
-  { id: "all", name: "Semua Program", icon: Globe },
-  { id: "education", name: "Pendidikan", icon: BookOpen },
-  { id: "social", name: "Kemahasiswaan", icon: Users },
-  { id: "technology", name: "Teknologi", icon: Lightbulb },
-  { id: "entrepreneurship", name: "Kewirausahaan", icon: Trophy },
-  { id: "wellness", name: "Kesejahteraan", icon: Heart }
-];
-
 export default function Programs() {
+  const [programs, setPrograms] = useState<Program[]>([]);
+
+  // Load data from localStorage
+  useEffect(() => {
+    const loadProgramsData = () => {
+      const savedPrograms = localStorage.getItem("programsList");
+      if (savedPrograms) {
+        const parsedPrograms = JSON.parse(savedPrograms);
+        console.log("Programs data before migration:", parsedPrograms);
+
+        // Smart migration - preserve existing dates, only add missing fields
+        const smartMigratedPrograms = parsedPrograms.map((program: Program) => {
+          // Preserve existing publishedDate if it exists, otherwise use today
+          const publishedDate = program.publishedDate || new Date().toISOString().split('T')[0];
+          const publishedBy = program.publishedBy || "Administrator";
+
+          return {
+            ...program,
+            publishedDate,
+            publishedBy
+          };
+        });
+
+        console.log("Programs data after smart migration:", smartMigratedPrograms);
+
+        // Check if any migration was needed
+        const needsMigration = parsedPrograms.some((p: Program) =>
+          !p.publishedDate || !p.publishedBy
+        );
+
+        if (needsMigration) {
+          console.log("Migration was needed, saving to localStorage");
+          localStorage.setItem("programsList", JSON.stringify(smartMigratedPrograms));
+        }
+
+        setPrograms(smartMigratedPrograms);
+      }
+    };
+
+    loadProgramsData();
+  }, []);
+
+  // Force refresh data function
+  const forceRefresh = () => {
+    const savedPrograms = localStorage.getItem("programsList");
+    if (savedPrograms) {
+      const parsedPrograms = JSON.parse(savedPrograms);
+      console.log("Force refreshing programs data:", parsedPrograms);
+
+      // Smart migration - preserve existing dates, only add missing fields
+      const smartMigratedPrograms = parsedPrograms.map((program: Program) => {
+        // For force refresh, use current date for missing fields but preserve existing ones
+        const publishedDate = program.publishedDate || new Date().toISOString().split('T')[0];
+        const publishedBy = program.publishedBy || "Administrator";
+
+        return {
+          ...program,
+          publishedDate,
+          publishedBy
+        };
+      });
+
+      console.log("Force migrated programs:", smartMigratedPrograms);
+      setPrograms(smartMigratedPrograms);
+
+      // Save smart migrated data back to localStorage
+      localStorage.setItem("programsList", JSON.stringify(smartMigratedPrograms));
+
+      alert("Data berhasil di-refresh! Tanggal yang sudah ada dipertahankan.");
+    }
+  };
+
   const getStatusBadge = (status: Program["status"]) => {
     const variants = {
-      active: "bg-green-100 text-green-800",
-      planned: "bg-blue-100 text-blue-800", 
-      completed: "bg-gray-100 text-gray-800"
+      sudah_terlaksana: "bg-green-100 text-green-800",
+      sedang_berjalan: "bg-blue-100 text-blue-800",
+      belum_terlaksana: "bg-gray-100 text-gray-800"
     };
-    
+
     const labels = {
-      active: "Aktif",
-      planned: "Direncanakan",
-      completed: "Selesai"
+      sudah_terlaksana: "Sudah Terlaksana",
+      sedang_berjalan: "Sedang Berjalan",
+      belum_terlaksana: "Belum Terlaksana"
     };
-    
+
     return (
       <Badge className={variants[status]}>
         {labels[status]}
       </Badge>
     );
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const categoryMap = {
-      education: BookOpen,
-      social: Users,
-      technology: Lightbulb,
-      entrepreneurship: Trophy,
-      wellness: Heart
-    };
-    return categoryMap[category as keyof typeof categoryMap] || Globe;
-  };
-
-  const filterPrograms = (category: string) => {
-    if (category === "all") return programs;
-    return programs.filter(program => program.category === category);
   };
 
   return (
@@ -134,67 +118,64 @@ export default function Programs() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Berbagai program inovatif yang dirancang untuk memajukan kehidupan kampus dan mengembangkan potensi mahasiswa UTU.
           </p>
+          {/* Debug button for force refresh */}
+          <Button onClick={forceRefresh} variant="outline" className="mb-4">
+            🔄 Force Refresh Data (Debug)
+          </Button>
         </div>
 
-        <Tabs defaultValue="all" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <TabsTrigger key={category.id} value={category.id} className="flex items-center space-x-2">
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{category.name}</span>
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-
-          {categories.map((category) => (
-            <TabsContent key={category.id} value={category.id} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filterPrograms(category.id).map((program) => {
-                  const CategoryIcon = getCategoryIcon(program.category);
-                  return (
-                    <Card key={program.id} className="shadow-card hover:shadow-primary transition-smooth group">
-                      <CardHeader className="space-y-4">
-                        <div className="flex items-start justify-between">
-                          <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center group-hover:animate-bounce">
-                            <CategoryIcon className="h-6 w-6 text-white" />
-                          </div>
-                          {getStatusBadge(program.status)}
-                        </div>
-                        <CardTitle className="text-xl text-primary group-hover:text-gold transition-smooth">
-                          {program.title}
-                        </CardTitle>
-                      </CardHeader>
-                      
-                      <CardContent className="space-y-4">
-                        <p className="text-muted-foreground leading-relaxed">
-                          {program.description}
-                        </p>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="font-medium text-primary">Dampak:</span>
-                            <span className="text-muted-foreground">{program.impact}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium text-primary">Timeline:</span>
-                            <span className="text-muted-foreground">{program.timeline}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium text-primary">Peserta:</span>
-                            <span className="text-muted-foreground">{program.participants}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+        {/* Programs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {programs.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Globe className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+                Belum ada program kerja
+              </h3>
+              <p className="text-muted-foreground">
+                Program kerja akan ditampilkan setelah admin menambahkannya
+              </p>
+            </div>
+          ) : (
+            programs.map((program) => (
+              <Card key={program.id} className="shadow-card hover:shadow-primary transition-smooth group">
+                <CardHeader className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center group-hover:animate-bounce">
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                    {getStatusBadge(program.status)}
+                  </div>
+                  <CardTitle className="text-xl text-primary group-hover:text-gold transition-smooth">
+                    {program.nama}
+                  </CardTitle>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground leading-relaxed">
+                    {program.deskripsi}
+                  </p>
+                  
+                  <div className="text-sm text-muted-foreground">
+                    Diterbitkan oleh {program.publishedBy || "Administrator"} pada {
+                      program.publishedDate ? 
+                        new Date(program.publishedDate).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        }) : 
+                        new Date(program.createdAt).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })
+                    }
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
 
         {/* Call to Action */}
         <div className="mt-20">

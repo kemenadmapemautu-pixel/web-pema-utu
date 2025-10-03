@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Home, Users, Target, Briefcase, FileText, Mail } from "lucide-react";
+import { Menu, X, Home, Users, Target, Briefcase, FileText, Mail, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import pemaLogo from "@/assets/pema-logo.png";
 import kabinetLogo from "@/assets/kabinet-logo.png";
+
 const navItems = [{
   name: "Beranda",
   path: "/",
@@ -33,6 +35,7 @@ const navItems = [{
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, currentUser } = useAuth();
   return <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -57,6 +60,25 @@ export function Navigation() {
                   {isActive && <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gold rounded-full" />}
                 </Link>;
           })}
+          
+          {/* Auth Button */}
+          {isAuthenticated ? (
+            <Link 
+              to="/admin/dashboard" 
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium bg-gold text-primary hover:bg-gold-dark transition-smooth"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
+          ) : (
+            <Link 
+              to="/login" 
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium border border-gold text-gold hover:bg-gold hover:text-primary transition-smooth"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </Link>
+          )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -76,6 +98,29 @@ export function Navigation() {
                     <span>{item.name}</span>
                   </Link>;
           })}
+          
+          {/* Mobile Auth Button */}
+          <div className="border-t border-border pt-2 mt-2">
+            {isAuthenticated ? (
+              <Link 
+                to="/admin/dashboard" 
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium bg-gold text-primary"
+                onClick={() => setIsOpen(false)}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span>Dashboard ({currentUser?.name})</span>
+              </Link>
+            ) : (
+              <Link 
+                to="/login" 
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium border border-gold text-gold"
+                onClick={() => setIsOpen(false)}
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Login Admin</span>
+              </Link>
+            )}
+          </div>
             </div>
           </div>}
       </div>

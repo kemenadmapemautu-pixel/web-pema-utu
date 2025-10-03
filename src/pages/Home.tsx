@@ -46,11 +46,12 @@ export default function Home() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
-                  <Link to="/cabinet">
-                    Lihat Kabinet
-                  </Link>
-                </Button>
+                <Link 
+                  to="/cabinet"
+                  className="inline-flex items-center justify-center border border-yellow-400 text-yellow-400 font-semibold px-5 py-3 rounded-xl hover:bg-yellow-400 hover:text-black transition"
+                >
+                  Lihat Kabinet
+                </Link>
               </div>
             </div>
             

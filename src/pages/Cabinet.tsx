@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Phone, MapPin, Calendar, Award } from "lucide-react";
+import { Mail, Phone, MapPin, Calendar, Award, User } from "lucide-react";
 import presidentImg from "@/assets/president.jpg";
 import vicePresidentImg from "@/assets/vice-president.jpg";
 import minister1Img from "@/assets/minister-1.jpg";
@@ -22,63 +22,85 @@ interface CabinetMember {
   period: string;
 }
 
-const cabinetMembers: CabinetMember[] = [
-  {
-    id: "president",
-    name: "Ahmad Fauzi Rahman",
-    position: "Presiden Mahasiswa",
-    faculty: "Fakultas Teknik",
-    department: "Teknik Informatika",
-    email: "president@pema.utu.ac.id",
-    phone: "+62 812-3456-7890",
-    image: presidentImg,
-    description: "Memimpin dengan visi untuk mewujudkan kampus yang inovatif dan berkualitas. Berpengalaman dalam organisasi kemahasiswaan dan memiliki dedikasi tinggi untuk kemajuan universitas.",
-    achievements: ["Juara 1 Lomba Debat Nasional 2023", "Best Speaker ASEAN Youth Conference", "Founder StartupTech Community"],
-    period: "2024-2025"
-  },
-  {
-    id: "vice-president",
-    name: "Siti Nurhaliza",
-    position: "Wakil Presiden",
-    faculty: "Fakultas Ekonomi",
-    department: "Manajemen Bisnis",
-    email: "vicepresident@pema.utu.ac.id",
-    phone: "+62 813-4567-8901",
-    image: vicePresidentImg,
-    description: "Mendukung kepemimpinan presiden dengan fokus pada pengembangan soft skill mahasiswa dan program kewirausahaan. Aktif dalam berbagai kegiatan sosial kemasyarakatan.",
-    achievements: ["Wirausaha Muda Terbaik 2023", "Koordinator Program CSR Universitas", "Mentor Startup Incubator"],
-    period: "2024-2025"
-  },
-  {
-    id: "minister-education",
-    name: "Putra Rahmat",
-    position: "Menteri Pendidikan",
-    faculty: "Fakultas Keguruan",
-    department: "Pendidikan Matematika",
-    email: "education@pema.utu.ac.id",
-    phone: "+62 814-5678-9012",
-    image: minister1Img,
-    description: "Mengelola program-program akademik dan pengembangan kualitas pendidikan di kampus. Berpengalaman sebagai tutor dan asisten dosen dengan track record yang baik.",
-    achievements: ["Mahasiswa Berprestasi 2023", "Tutor Terbaik Fakultas", "Penerima Beasiswa Unggulan"],
-    period: "2024-2025"
-  },
-  {
-    id: "minister-student-affairs",
-    name: "Fatimah Azzahra",
-    position: "Menteri Kemahasiswaan",
-    faculty: "Fakultas Hukum",
-    department: "Ilmu Hukum",
-    email: "studentaffairs@pema.utu.ac.id",
-    phone: "+62 815-6789-0123",
-    image: minister2Img,
-    description: "Bertanggung jawab atas kesejahteraan mahasiswa dan pengembangan organisasi kemahasiswaan. Aktif dalam advokasi hak-hak mahasiswa dan program pengembangan karakter.",
-    achievements: ["Aktivis Hak Mahasiswa Terbaik", "Koordinator Program Beasiswa", "Volunteer Award 2023"],
-    period: "2024-2025"
-  }
-];
+interface Pengurus {
+  id: string;
+  nama: string;
+  jabatan: string;
+  departemen?: string;
+  email: string;
+  telepon: string;
+  foto?: string;
+  tipe: "pimpinan" | "menteri";
+  fakultas?: string;
+  prodi?: string;
+  deskripsi?: string;
+  prestasi?: string[];
+  periode?: string;
+  // Login credentials
+  username?: string;
+  password?: string;
+  hasAccount?: boolean;
+  profileCompleted?: boolean;
+  // Additional profile info
+  socialMedia?: {
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+  };
+  education?: string;
+  experience?: string;
+  organizationHistory?: string[];
+}
+
+// Data kabinet sekarang sepenuhnya dikelola melalui admin dashboard
+const cabinetMembers: CabinetMember[] = [];
 
 export default function Cabinet() {
   const [selectedMember, setSelectedMember] = useState<CabinetMember | null>(null);
+  const [dynamicMembers, setDynamicMembers] = useState<CabinetMember[]>([]);
+
+  useEffect(() => {
+    // Load data pengurus dari localStorage
+    const savedPengurus = localStorage.getItem("pengurusList");
+    if (savedPengurus) {
+      const pengurusList: Pengurus[] = JSON.parse(savedPengurus);
+      
+      // Convert pengurus data to cabinet member format - hanya yang profileCompleted
+      const convertedMembers: (CabinetMember & { tipe: string })[] = pengurusList
+        .filter(pengurus => pengurus.profileCompleted === true) // Hanya tampilkan profil lengkap
+        .map(pengurus => {
+          console.log('Converting pengurus:', pengurus.nama, 'organizationHistory:', pengurus.organizationHistory);
+          return {
+            id: pengurus.id,
+            name: pengurus.nama,
+            position: pengurus.jabatan,
+            faculty: pengurus.fakultas || "Fakultas",
+            department: pengurus.prodi || pengurus.departemen || "Program Studi",
+            email: pengurus.email,
+            phone: pengurus.telepon,
+            image: pengurus.foto || presidentImg, // Base64 atau fallback image
+            description: pengurus.deskripsi || `Anggota kabinet PEMA UTU yang bertugas sebagai ${pengurus.jabatan}. Berkomitmen untuk melayani mahasiswa dengan dedikasi tinggi.`,
+            achievements: pengurus.prestasi || ["Anggota Kabinet PEMA UTU", "Aktif dalam kegiatan kemahasiswaan"],
+            period: pengurus.periode || "2024-2025",
+            tipe: pengurus.tipe,
+            // Tambahan info dari profil lengkap
+            socialMedia: pengurus.socialMedia || {},
+            education: pengurus.education || "",
+            experience: pengurus.experience || "",
+            organizationHistory: pengurus.organizationHistory || []
+          };
+        });
+      
+      setDynamicMembers(convertedMembers);
+    }
+  }, []);
+
+  // Combine static and dynamic members
+  const allMembers = [...cabinetMembers, ...dynamicMembers];
+  
+  // Separate leadership and ministers based on tipe
+  const leadership = dynamicMembers.filter((member: any) => member.tipe === "pimpinan");
+  const ministers = dynamicMembers.filter((member: any) => member.tipe === "menteri");
 
   const renderMemberCard = (member: CabinetMember, isLeadership: boolean = false) => (
     <Card 
@@ -95,6 +117,10 @@ export default function Cabinet() {
               src={member.image}
               alt={`${member.name} - ${member.position}`}
               className="w-24 h-24 rounded-full object-cover border-4 border-gold/20 group-hover:border-gold transition-smooth"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = presidentImg; // Fallback to default image
+              }}
             />
             <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gold rounded-full flex items-center justify-center">
               <Award className="h-4 w-4 text-primary" />
@@ -137,13 +163,25 @@ export default function Cabinet() {
 
           <TabsContent value="leadership" className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {cabinetMembers.slice(0, 2).map(member => renderMemberCard(member, true))}
+              {leadership.map(member => renderMemberCard(member, true))}
+              {leadership.length === 0 && (
+                <div className="col-span-2 text-center py-12">
+                  <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Belum ada data pimpinan yang tersedia</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
           <TabsContent value="ministers" className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {cabinetMembers.slice(2).map(member => renderMemberCard(member))}
+              {ministers.map(member => renderMemberCard(member))}
+              {ministers.length === 0 && (
+                <div className="col-span-3 text-center py-12">
+                  <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Belum ada data menteri yang tersedia</p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
@@ -159,6 +197,10 @@ export default function Cabinet() {
                       src={selectedMember.image}
                       alt={selectedMember.name}
                       className="w-32 h-32 rounded-full object-cover border-4 border-gold mx-auto md:mx-0"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = presidentImg; // Fallback to default image
+                      }}
                     />
                   </div>
                   
@@ -207,10 +249,11 @@ export default function Cabinet() {
                       </div>
                     </div>
                     
+                    {/* Prestasi & Penghargaan */}
                     <div>
                       <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
                         <Award className="h-5 w-5 text-gold mr-2" />
-                        Prestasi & Pencapaian
+                        Prestasi & Penghargaan
                       </h3>
                       <ul className="space-y-2">
                         {selectedMember.achievements.map((achievement, index) => (
@@ -221,6 +264,67 @@ export default function Cabinet() {
                         ))}
                       </ul>
                     </div>
+
+                    {/* Riwayat Organisasi */}
+                    {(() => {
+                      const orgHistory = (selectedMember as any).organizationHistory;
+                      console.log('Organization History:', orgHistory);
+                      return orgHistory && orgHistory.length > 0;
+                    })() && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
+                          <User className="h-5 w-5 text-gold mr-2" />
+                          Riwayat Organisasi
+                        </h3>
+                        <ul className="space-y-2">
+                          {(selectedMember as any).organizationHistory.map((organization: string, index: number) => (
+                            <li key={index} className="flex items-start space-x-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span className="text-sm text-muted-foreground">{organization}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Media Sosial */}
+                    {(selectedMember as any).socialMedia && 
+                     ((selectedMember as any).socialMedia.instagram || 
+                      (selectedMember as any).socialMedia.linkedin || 
+                      (selectedMember as any).socialMedia.twitter) && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
+                          <Mail className="h-5 w-5 text-gold mr-2" />
+                          Media Sosial
+                        </h3>
+                        <div className="space-y-2">
+                          {(selectedMember as any).socialMedia.instagram && (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-pink-500">📷</span>
+                              <span className="text-sm text-muted-foreground">
+                                {(selectedMember as any).socialMedia.instagram}
+                              </span>
+                            </div>
+                          )}
+                          {(selectedMember as any).socialMedia.linkedin && (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-blue-600">💼</span>
+                              <span className="text-sm text-muted-foreground">
+                                {(selectedMember as any).socialMedia.linkedin}
+                              </span>
+                            </div>
+                          )}
+                          {(selectedMember as any).socialMedia.twitter && (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-blue-400">🐦</span>
+                              <span className="text-sm text-muted-foreground">
+                                {(selectedMember as any).socialMedia.twitter}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
