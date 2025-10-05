@@ -57,36 +57,6 @@ export default function Programs() {
     loadProgramsData();
   }, []);
 
-  // Force refresh data function
-  const forceRefresh = () => {
-    const savedPrograms = localStorage.getItem("programsList");
-    if (savedPrograms) {
-      const parsedPrograms = JSON.parse(savedPrograms);
-      console.log("Force refreshing programs data:", parsedPrograms);
-
-      // Smart migration - preserve existing dates, only add missing fields
-      const smartMigratedPrograms = parsedPrograms.map((program: Program) => {
-        // For force refresh, use current date for missing fields but preserve existing ones
-        const publishedDate = program.publishedDate || new Date().toISOString().split('T')[0];
-        const publishedBy = program.publishedBy || "Administrator";
-
-        return {
-          ...program,
-          publishedDate,
-          publishedBy
-        };
-      });
-
-      console.log("Force migrated programs:", smartMigratedPrograms);
-      setPrograms(smartMigratedPrograms);
-
-      // Save smart migrated data back to localStorage
-      localStorage.setItem("programsList", JSON.stringify(smartMigratedPrograms));
-
-      alert("Data berhasil di-refresh! Tanggal yang sudah ada dipertahankan.");
-    }
-  };
-
   const getStatusBadge = (status: Program["status"]) => {
     const variants = {
       sudah_terlaksana: "bg-green-100 text-green-800",
@@ -118,10 +88,6 @@ export default function Programs() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Berbagai program inovatif yang dirancang untuk memajukan kehidupan kampus dan mengembangkan potensi mahasiswa UTU.
           </p>
-          {/* Debug button for force refresh */}
-          <Button onClick={forceRefresh} variant="outline" className="mb-4">
-            🔄 Force Refresh Data (Debug)
-          </Button>
         </div>
 
         {/* Programs Grid */}
