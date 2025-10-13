@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { 
   LogOut, 
   Users, 
-  UserPlus, 
   LayoutDashboard,
   Settings,
   FileText,
   MessageSquare,
-  Key,
-  BookOpen
+  BookOpen,
+  Image,
+  Building2
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -66,21 +66,40 @@ export default function Dashboard() {
       }
     ];
 
+    const ministerMenuItems = [
+      {
+        title: "Kelola Kementerian",
+        description: "Kelola halaman, konten, tim wakil menteri & staff kementerian Anda",
+        icon: Building2,
+        path: "/admin/ministry",
+        color: "bg-gradient-to-r from-indigo-500 to-purple-500",
+        roles: ["menteri"]
+      },
+      {
+        title: "Kelola Konten Kementerian",
+        description: "Edit visi, misi, deskripsi, dan program kerja kementerian Anda",
+        icon: FileText,
+        path: "/admin/ministry-content",
+        color: "bg-indigo-500",
+        roles: ["menteri"]
+      },
+      {
+        title: "Kelola Tim Kementerian",
+        description: "Tambah dan kelola Wakil Menteri & Staff kementerian Anda",
+        icon: Users,
+        path: "/admin/ministry-team",
+        color: "bg-purple-500",
+        roles: ["menteri"]
+      }
+    ];
+
     const adminMenuItems = [
         {
-          title: "Kelola Data Pengurus",
-          description: "Tambah, edit, atau hapus data pengurus kabinet",
+          title: "Kelola Pengurus & Akun",
+          description: "Kelola data pengurus, akun login, tambah/hapus profil dan akun",
           icon: Users,
           path: "/admin/pengurus",
           color: "bg-blue-500",
-          roles: ["admin"]
-        },
-        {
-          title: "Kelola Akun",
-          description: "Lihat dan kelola akun login anggota kabinet",
-          icon: Key,
-          path: "/admin/accounts",
-          color: "bg-emerald-500",
           roles: ["admin"]
         },
         {
@@ -89,6 +108,14 @@ export default function Dashboard() {
           icon: FileText,
           path: "/admin/news",
           color: "bg-green-500",
+          roles: ["admin"]
+        },
+        {
+          title: "Kelola Galeri",
+          description: "Upload dan kelola foto & video kegiatan",
+          icon: Image,
+          path: "/admin/gallery",
+          color: "bg-pink-500",
           roles: ["admin"]
         },
         {
@@ -106,20 +133,14 @@ export default function Dashboard() {
           path: "/admin/messages",
           color: "bg-purple-500",
           roles: ["admin"]
-        },
-        {
-          title: "Tambah Pengurus Baru",
-          description: "Daftarkan anggota kabinet baru",
-          icon: UserPlus,
-          path: "/admin/pengurus/tambah",
-          color: "bg-orange-500",
-          roles: ["admin"]
         }
       ];
 
     // Return menu berdasarkan role
     if (isAdmin()) {
       return [...adminMenuItems, ...baseMenuItems];
+    } else if (currentUser?.role === "menteri") {
+      return [...ministerMenuItems, ...baseMenuItems];
     } else {
       return baseMenuItems;
     }
@@ -193,7 +214,7 @@ export default function Dashboard() {
             </h2>
             <p className="text-muted-foreground">
               {isAdmin() 
-                ? "Kelola data pengurus dan kabinet PEMA UTU dengan mudah melalui dashboard ini."
+                ? "Kelola pengurus, akun, berita, dan seluruh konten PEMA UTU dengan mudah melalui dashboard terpadu ini."
                 : profileCompleted 
                   ? "Profil Anda sudah lengkap dan tampil di website PEMA UTU."
                   : "Silakan lengkapi profil Anda untuk tampil di website PEMA UTU."

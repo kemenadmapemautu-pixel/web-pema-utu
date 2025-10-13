@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Phone, MapPin, Calendar, Award, User } from "lucide-react";
+import { Mail, Phone, MapPin, Calendar, Award, User, Instagram, Linkedin, Twitter, ExternalLink, X } from "lucide-react";
 import presidentImg from "@/assets/president.jpg";
 import vicePresidentImg from "@/assets/vice-president.jpg";
 import minister1Img from "@/assets/minister-1.jpg";
@@ -188,33 +188,62 @@ export default function Cabinet() {
 
         {/* Member Detail Modal */}
         {selectedMember && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedMember(null)}>
-            <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="p-8">
+          <div 
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm animate-in fade-in duration-200" 
+            onClick={() => setSelectedMember(null)}
+          >
+            <div 
+              className="bg-background rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header with Close Button */}
+              <div className="sticky top-0 bg-gradient-to-r from-primary/5 to-gold/5 z-10 flex items-center justify-between px-6 py-4 border-b">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-gold flex items-center justify-center">
+                    <User className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-primary">Profil</h3>
+                    <p className="text-xs text-muted-foreground">Detail informasi</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedMember(null)}
+                  className="p-2 rounded-full bg-white hover:bg-red-50 hover:text-red-600 transition-all shadow-sm hover:shadow-md group"
+                  aria-label="Close modal"
+                >
+                  <X className="h-5 w-5 text-gray-500 group-hover:text-red-600 transition-colors" />
+                </button>
+              </div>
+
+              <div className="p-8 overflow-y-auto max-h-[calc(90vh-80px)]">
                 <div className="flex flex-col md:flex-row gap-8">
+                  {/* Profile Image */}
                   <div className="flex-shrink-0">
                     <img
                       src={selectedMember.image}
                       alt={selectedMember.name}
-                      className="w-32 h-32 rounded-full object-cover border-4 border-gold mx-auto md:mx-0"
+                      className="w-32 h-32 rounded-full object-cover border-4 border-gold mx-auto md:mx-0 shadow-lg"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = presidentImg; // Fallback to default image
+                        target.src = presidentImg;
                       }}
                     />
                   </div>
                   
                   <div className="flex-1 space-y-6">
+                    {/* Header */}
                     <div>
                       <h2 className="text-2xl font-bold text-primary mb-2">{selectedMember.name}</h2>
                       <Badge className="bg-gold text-primary mb-4">{selectedMember.position}</Badge>
                       <p className="text-muted-foreground leading-relaxed">{selectedMember.description}</p>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Contact Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gradient-to-br from-gray-50 to-white rounded-lg border">
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3">
-                          <MapPin className="h-4 w-4 text-gold" />
+                          <MapPin className="h-4 w-4 text-gold flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium">{selectedMember.faculty}</p>
                             <p className="text-xs text-muted-foreground">{selectedMember.department}</p>
@@ -222,7 +251,7 @@ export default function Cabinet() {
                         </div>
                         
                         <div className="flex items-center space-x-3">
-                          <Calendar className="h-4 w-4 text-gold" />
+                          <Calendar className="h-4 w-4 text-gold flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium">Periode</p>
                             <p className="text-xs text-muted-foreground">{selectedMember.period}</p>
@@ -232,15 +261,15 @@ export default function Cabinet() {
                       
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3">
-                          <Mail className="h-4 w-4 text-gold" />
+                          <Mail className="h-4 w-4 text-gold flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium">Email</p>
-                            <p className="text-xs text-muted-foreground">{selectedMember.email}</p>
+                            <p className="text-xs text-muted-foreground break-all">{selectedMember.email}</p>
                           </div>
                         </div>
                         
                         <div className="flex items-center space-x-3">
-                          <Phone className="h-4 w-4 text-gold" />
+                          <Phone className="h-4 w-4 text-gold flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium">Telepon</p>
                             <p className="text-xs text-muted-foreground">{selectedMember.phone}</p>
@@ -249,8 +278,8 @@ export default function Cabinet() {
                       </div>
                     </div>
                     
-                    {/* Prestasi & Penghargaan */}
-                    <div>
+                    {/* Achievements */}
+                    <div className="p-4 bg-gradient-to-br from-gold/5 to-primary/5 rounded-lg border border-gold/20">
                       <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
                         <Award className="h-5 w-5 text-gold mr-2" />
                         Prestasi & Penghargaan
@@ -265,15 +294,12 @@ export default function Cabinet() {
                       </ul>
                     </div>
 
-                    {/* Riwayat Organisasi */}
-                    {(() => {
-                      const orgHistory = (selectedMember as any).organizationHistory;
-                      console.log('Organization History:', orgHistory);
-                      return orgHistory && orgHistory.length > 0;
-                    })() && (
-                      <div>
+                    {/* Organization History */}
+                    {(selectedMember as any).organizationHistory && 
+                     (selectedMember as any).organizationHistory.length > 0 && (
+                      <div className="p-4 bg-gradient-to-br from-blue-50 to-white rounded-lg border border-blue-100">
                         <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
-                          <User className="h-5 w-5 text-gold mr-2" />
+                          <User className="h-5 w-5 text-blue-600 mr-2" />
                           Riwayat Organisasi
                         </h3>
                         <ul className="space-y-2">
@@ -287,40 +313,76 @@ export default function Cabinet() {
                       </div>
                     )}
 
-                    {/* Media Sosial */}
+                    {/* Social Media */}
                     {(selectedMember as any).socialMedia && 
                      ((selectedMember as any).socialMedia.instagram || 
                       (selectedMember as any).socialMedia.linkedin || 
                       (selectedMember as any).socialMedia.twitter) && (
-                      <div>
-                        <h3 className="text-lg font-semibold text-primary mb-3 flex items-center">
-                          <Mail className="h-5 w-5 text-gold mr-2" />
+                      <div className="p-4 bg-gradient-to-br from-purple-50 to-white rounded-lg border border-purple-100">
+                        <h3 className="text-lg font-semibold text-primary mb-4 flex items-center">
+                          <Mail className="h-5 w-5 text-purple-600 mr-2" />
                           Media Sosial
                         </h3>
-                        <div className="space-y-2">
+                        <div className="flex flex-wrap gap-3">
                           {(selectedMember as any).socialMedia.instagram && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-pink-500">📷</span>
-                              <span className="text-sm text-muted-foreground">
-                                {(selectedMember as any).socialMedia.instagram}
-                              </span>
-                            </div>
+                            <a 
+                              href={(() => {
+                                const ig = (selectedMember as any).socialMedia.instagram;
+                                if (ig.startsWith('http')) return ig;
+                                if (ig.startsWith('@')) return `https://instagram.com/${ig.substring(1)}`;
+                                if (ig.includes('instagram.com')) return `https://${ig.replace(/^(https?:\/\/)?(www\.)?/, '')}`;
+                                return `https://instagram.com/${ig}`;
+                              })()} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 px-4 py-2 bg-pink-50 hover:bg-pink-100 rounded-lg transition-all hover:scale-105 hover:shadow-md group border border-pink-200"
+                            >
+                              <Instagram className="h-5 w-5 text-pink-600" />
+                              <span className="text-sm text-pink-600 font-medium">Instagram</span>
+                              <ExternalLink className="h-3 w-3 text-pink-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
                           )}
                           {(selectedMember as any).socialMedia.linkedin && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-blue-600">💼</span>
-                              <span className="text-sm text-muted-foreground">
-                                {(selectedMember as any).socialMedia.linkedin}
-                              </span>
-                            </div>
+                            <a 
+                              href={(() => {
+                                const li = (selectedMember as any).socialMedia.linkedin;
+                                if (li.startsWith('http')) return li;
+                                if (li.includes('linkedin.com')) return `https://${li.replace(/^(https?:\/\/)?(www\.)?/, '')}`;
+                                return `https://linkedin.com/in/${li}`;
+                              })()} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all hover:scale-105 hover:shadow-md group border border-blue-200"
+                            >
+                              <Linkedin className="h-5 w-5 text-blue-600" />
+                              <span className="text-sm text-blue-600 font-medium">LinkedIn</span>
+                              <ExternalLink className="h-3 w-3 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
                           )}
                           {(selectedMember as any).socialMedia.twitter && (
-                            <div className="flex items-center space-x-2">
-                              <span className="text-blue-400">🐦</span>
-                              <span className="text-sm text-muted-foreground">
-                                {(selectedMember as any).socialMedia.twitter}
+                            <a 
+                              href={(() => {
+                                const tw = (selectedMember as any).socialMedia.twitter;
+                                if (tw.startsWith('http')) return tw;
+                                if (tw.includes('tiktok.com')) {
+                                  return tw.startsWith('http') ? tw : `https://${tw.replace(/^(https?:\/\/)?(www\.)?/, '')}`;
+                                }
+                                if (tw.startsWith('@')) return `https://twitter.com/${tw.substring(1)}`;
+                                if (tw.includes('twitter.com') || tw.includes('x.com')) {
+                                  return `https://${tw.replace(/^(https?:\/\/)?(www\.)?/, '')}`;
+                                }
+                                return `https://twitter.com/${tw}`;
+                              })()} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center space-x-2 px-4 py-2 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all hover:scale-105 hover:shadow-md group border border-sky-200"
+                            >
+                              <Twitter className="h-5 w-5 text-sky-600" />
+                              <span className="text-sm text-sky-600 font-medium">
+                                {(selectedMember as any).socialMedia.twitter.includes('tiktok') ? 'TikTok' : 'Twitter'}
                               </span>
-                            </div>
+                              <ExternalLink className="h-3 w-3 text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
                           )}
                         </div>
                       </div>

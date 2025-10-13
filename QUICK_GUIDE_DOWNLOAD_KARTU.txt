@@ -1,0 +1,154 @@
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║   📥 QUICK GUIDE: DOWNLOAD KARTU AKUN PENGURUS          ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+
+🎯 TUJUAN:
+Download username & password pengurus dalam format gambar PNG
+yang siap dikirim via WhatsApp/Email/Telegram
+
+═══════════════════════════════════════════════════════════
+
+🚀 CARA CEPAT (3 LANGKAH):
+
+1. Login Admin → Kelola Pengurus & Akun
+
+2. Cari pengurus yang sudah punya akun (badge hijau "✅ Punya Akun")
+
+3. Klik tombol HIJAU dengan icon Download 📥
+
+DONE! File PNG otomatis terdownload! ✅
+
+═══════════════════════════════════════════════════════════
+
+📁 NAMA FILE:
+
+Format: Akun_[Nama]_[Username].png
+
+Contoh:
+- Akun_Putra_Rahmat_Pim_putrarahmat_001.png
+- Akun_M_Khavi_Badrian_Men_mkhavibadrian_01.png
+
+═══════════════════════════════════════════════════════════
+
+🎨 ISI KARTU:
+
+┌─────────────────────────────────────┐
+│  PEMA UTU                           │
+│  Kabinet Samgrahita 2024-2025       │
+├─────────────────────────────────────┤
+│  Nama:     [Nama Lengkap]           │
+│  Jabatan:  [Jabatan]                │
+│  NIM:      [NIM]                    │
+│                                     │
+│  Username: [username_login]         │
+│  Password: [password_login]         │
+│                                     │
+│  ⚠️ Simpan dengan aman!             │
+└─────────────────────────────────────┘
+
+Ukuran: 800 x 500 px (perfect untuk share!)
+
+═══════════════════════════════════════════════════════════
+
+📤 KIRIM KE PENGURUS:
+
+Via WhatsApp (Recommended):
+1. Download kartu
+2. Kirim gambar via WA personal
+3. Tambah pesan: "Ini kredensial login Anda. Jangan share!"
+
+Via Email:
+1. Download kartu
+2. Attach PNG file
+3. Subject: "Kredensial Login Dashboard PEMA UTU"
+4. Send!
+
+═══════════════════════════════════════════════════════════
+
+🔢 DOWNLOAD SEMUA PENGURUS:
+
+Total: 18 pengurus (6 pimpinan + 12 menteri)
+
+Cara manual:
+- Klik download satu per satu (18x klik)
+- Delay 1-2 detik antar klik
+- Organize file ke folder
+
+Cara auto (via console):
+- Buka console (F12)
+- Lihat file: DOWNLOAD_KARTU_AKUN_GUIDE.md
+- Copy script auto-download
+
+═══════════════════════════════════════════════════════════
+
+💡 TIPS:
+
+✅ Download semua kartu dulu baru kirim
+✅ Buat folder organize: Pimpinan/ dan Menteri/
+✅ Track siapa yang sudah dikasih akun
+✅ Follow up yang belum login
+✅ Reminder ganti password setelah login pertama
+
+❌ Jangan kirim di grup publik
+❌ Jangan screenshot & share sembarangan
+❌ Jangan lupa hapus file setelah kirim (opsional)
+
+═══════════════════════════════════════════════════════════
+
+🎯 QUICK CHECKLIST:
+
+[ ] Login sebagai admin
+[ ] Buka "Kelola Pengurus & Akun"
+[ ] Pastikan data sudah di-populate (ada 18 pengurus)
+[ ] Download kartu semua pimpinan (6 kartu)
+[ ] Download kartu semua menteri (12 kartu)
+[ ] Organize file ke folder
+[ ] Kirim ke masing-masing pengurus
+[ ] Confirm receipt
+[ ] Track login status
+[ ] Reminder ganti password
+
+═══════════════════════════════════════════════════════════
+
+⚠️ TROUBLESHOOTING:
+
+Problem: Tombol download tidak muncul
+Fix: Pastikan pengurus punya badge "✅ Punya Akun"
+
+Problem: File tidak terdownload
+Fix: Check browser settings → allow downloads
+
+Problem: Kartu blank/kosong
+Fix: Refresh page, clear cache, try again
+
+Problem: Password tidak ada
+Fix: Re-populate data pengurus
+
+═══════════════════════════════════════════════════════════
+
+📞 NEED HELP?
+
+1. Baca: DOWNLOAD_KARTU_AKUN_GUIDE.md (panduan lengkap)
+2. Baca: README_ADMIN_FIX.txt (fix admin login)
+3. Buka browser console (F12) untuk cek error
+4. Contact developer dengan screenshot
+
+═══════════════════════════════════════════════════════════
+
+🆕 FITUR BARU v1.0:
+
+• Download kartu akun per pengurus
+• Design branded PEMA UTU
+• Format PNG 800x500px
+• Auto-generate filename
+• Tombol hijau di action column
+• Canvas-based rendering
+• High quality output
+
+═══════════════════════════════════════════════════════════
+
+Last Updated: 2025-10-10 08:38 WIB
+Status: ✅ READY TO USE
+Version: 1.0

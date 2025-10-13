@@ -1,6 +1,23 @@
 import { Instagram, MessageCircle, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { scrollToSection } from "@/lib/scrollUtils";
+
 export function Footer() {
+  const navigate = useNavigate();
+
+  const handleScrollLink = (path: string, sectionId?: string) => {
+    if (window.location.pathname === path && sectionId) {
+      // Jika sudah di halaman yang sama, langsung scroll
+      scrollToSection(sectionId);
+    } else if (sectionId) {
+      // Jika beda halaman, simpan section ID dan navigate
+      sessionStorage.setItem('scrollToSection', sectionId);
+      navigate(path);
+    } else {
+      // Jika tidak ada section ID, navigate biasa
+      navigate(path);
+    }
+  };
   return <footer className="gradient-primary text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -35,28 +52,40 @@ export function Footer() {
             <h3 className="text-lg font-semibold text-gold">Navigasi</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/', 'beranda')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Beranda
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/about" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/about')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Tentang Kami
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/cabinet" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/cabinet')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Kabinet
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/structure" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/structure')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Struktur Organisasi
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -66,28 +95,40 @@ export function Footer() {
             <h3 className="text-lg font-semibold text-gold">Program Kerja</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/programs" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/programs')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Semua Program
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/activities" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/activities')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Kegiatan
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/gallery" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
+                <button 
+                  onClick={() => handleScrollLink('/gallery')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
                   Galeri
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="/news" className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group">
-                  Berita
+                <button 
+                  onClick={() => handleScrollLink('/news')}
+                  className="text-sm text-white/80 hover:text-gold transition-smooth flex items-center group"
+                >
+                  Warta Pema
                   <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -138,11 +179,11 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-white/20">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-center sm:text-left">
             <p className="text-sm text-white/60 order-2 sm:order-1">
-              © 2024 Pemerintahan Mahasiswa Universitas Teuku Umar. All Rights Reserved.
+              © 2025 Pemerintahan Mahasiswa Universitas Teuku Umar. All Rights Reserved.
             </p>
             <div className="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6 text-sm text-white/60 order-1 sm:order-2">
-              <Link to="/contact" className="hover:text-gold transition-smooth">Kontak</Link>
-              <Link to="/vision-mission" className="hover:text-gold transition-smooth">Visi & Misi</Link>
+              <button onClick={() => handleScrollLink('/contact')} className="hover:text-gold transition-smooth">Kontak</button>
+              <button onClick={() => handleScrollLink('/vision-mission')} className="hover:text-gold transition-smooth">Visi & Misi</button>
               <span className="text-white/40">•</span>
               <span className="text-white/40">Privacy Policy</span>
             </div>

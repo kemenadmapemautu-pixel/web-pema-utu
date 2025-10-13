@@ -18,15 +18,6 @@ export default function Login() {
   const { toast } = useToast();
   const { login } = useAuth();
 
-  // Admin credentials - hanya admin yang bisa login langsung
-  const adminUser = {
-    username: "adminpemautu",
-    password: "luckystrike26",
-    role: "admin" as const,
-    name: "Administrator PEMA UTU",
-    id: "admin-001"
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -35,15 +26,21 @@ export default function Login() {
     setTimeout(() => {
       let user = null;
 
-      // Cek admin credentials
-      if (credentials.username === adminUser.username && credentials.password === adminUser.password) {
-        user = adminUser;
-      } else {
-        // Cek akun yang dibuat admin
-        const dynamicUsers = JSON.parse(localStorage.getItem("loginUsers") || "[]");
-        user = dynamicUsers.find((u: any) => 
-          u.username === credentials.username && u.password === credentials.password
-        );
+      // Cek akun dari localStorage (dibuat oleh populate atau admin)
+      const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+      const foundAccount = accounts.find((acc: any) => 
+        acc.username === credentials.username && acc.password === credentials.password
+      );
+
+      if (foundAccount) {
+        user = {
+          username: foundAccount.username,
+          name: foundAccount.name,
+          role: foundAccount.role,
+          id: foundAccount.id,
+          position: foundAccount.position,
+          department: foundAccount.department
+        };
       }
 
       if (user) {
@@ -55,11 +52,20 @@ export default function Login() {
           description: `Selamat datang, ${user.name} (${user.role})`,
         });
         
-        navigate("/admin/dashboard");
+        // Redirect berdasarkan role
+        if (user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (user.role === "pimpinan") {
+          navigate("/admin/dashboard");
+        } else if (user.role === "menteri") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/admin/dashboard");
+        }
       } else {
         toast({
           title: "Login Gagal",
-          description: "Username atau password salah",
+          description: "Username atau password salah. Pastikan akun sudah dibuat oleh admin.",
           variant: "destructive"
         });
       }
@@ -147,15 +153,12 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-muted rounded-lg">
-              <p className="text-sm font-semibold mb-2">ℹ️ Informasi Login:</p>
-              <div className="text-xs space-y-1 text-muted-foreground">
-                <p><strong>Admin:</strong> Gunakan credentials admin untuk kelola sistem</p>
-                <p><strong>Anggota Kabinet:</strong> Gunakan akun yang dibuat oleh admin</p>
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-sm font-semibold mb-2 text-blue-900 dark:text-blue-100">🔐 Informasi Login</p>
+              <div className="text-xs space-y-2 text-blue-700 dark:text-blue-300">
+                <p>Gunakan username dan password yang telah diberikan oleh admin.</p>
+                <p className="text-[10px] italic">Jika lupa kredensial, hubungi administrator PEMA UTU.</p>
               </div>
-              <p className="text-xs text-muted-foreground mt-2 italic">
-                Hubungi admin jika belum memiliki akun atau lupa password
-              </p>
             </div>
           </CardContent>
         </Card>

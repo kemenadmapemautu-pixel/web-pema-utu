@@ -21,7 +21,10 @@ import {
   Save,
   Upload,
   Eye,
-  EyeOff
+  EyeOff,
+  Instagram,
+  Linkedin,
+  Twitter
 } from "lucide-react";
 
 interface PengurusData {
@@ -598,32 +601,61 @@ export default function ProfileEdit() {
                 <div className="space-y-4">
                   <Label>Media Sosial</Label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Instagram */}
                     <div className="space-y-2">
-                      <Label htmlFor="instagram">Instagram</Label>
-                      <Input
-                        id="instagram"
-                        value={profileData.socialMedia.instagram}
-                        onChange={(e) => handleSocialMediaChange("instagram", e.target.value)}
-                        placeholder="@username"
-                      />
+                      <Label htmlFor="instagram" className="flex items-center gap-2">
+                        <Instagram className="h-4 w-4 text-pink-500" />
+                        Instagram
+                      </Label>
+                      <div className="relative">
+                        <Instagram className="absolute left-3 top-3 h-4 w-4 text-pink-500" />
+                        <Input
+                          id="instagram"
+                          value={profileData.socialMedia.instagram}
+                          onChange={(e) => handleSocialMediaChange("instagram", e.target.value)}
+                          placeholder="@username atau instagram.com/username"
+                          className="pl-10"
+                        />
+                      </div>
                     </div>
+
+                    {/* LinkedIn */}
                     <div className="space-y-2">
-                      <Label htmlFor="linkedin">LinkedIn</Label>
-                      <Input
-                        id="linkedin"
-                        value={profileData.socialMedia.linkedin}
-                        onChange={(e) => handleSocialMediaChange("linkedin", e.target.value)}
-                        placeholder="linkedin.com/in/username"
-                      />
+                      <Label htmlFor="linkedin" className="flex items-center gap-2">
+                        <Linkedin className="h-4 w-4 text-blue-600" />
+                        LinkedIn
+                      </Label>
+                      <div className="relative">
+                        <Linkedin className="absolute left-3 top-3 h-4 w-4 text-blue-600" />
+                        <Input
+                          id="linkedin"
+                          value={profileData.socialMedia.linkedin}
+                          onChange={(e) => handleSocialMediaChange("linkedin", e.target.value)}
+                          placeholder="linkedin.com/in/username"
+                          className="pl-10"
+                        />
+                      </div>
                     </div>
+
+                    {/* Twitter/TikTok - Auto detect */}
                     <div className="space-y-2">
-                      <Label htmlFor="twitter">Twitter</Label>
-                      <Input
-                        id="twitter"
-                        value={profileData.socialMedia.twitter}
-                        onChange={(e) => handleSocialMediaChange("twitter", e.target.value)}
-                        placeholder="@username"
-                      />
+                      <Label htmlFor="twitter" className="flex items-center gap-2">
+                        <Twitter className="h-4 w-4 text-sky-500" />
+                        {profileData.socialMedia.twitter?.includes('tiktok') ? 'TikTok' : 'Twitter'}
+                      </Label>
+                      <div className="relative">
+                        <Twitter className="absolute left-3 top-3 h-4 w-4 text-sky-500" />
+                        <Input
+                          id="twitter"
+                          value={profileData.socialMedia.twitter}
+                          onChange={(e) => handleSocialMediaChange("twitter", e.target.value)}
+                          placeholder="@username atau tiktok.com/@username"
+                          className="pl-10"
+                        />
+                      </div>
+                      {profileData.socialMedia.twitter?.includes('tiktok') && (
+                        <p className="text-xs text-muted-foreground">✓ TikTok terdeteksi</p>
+                      )}
                     </div>
                   </div>
                 </div>

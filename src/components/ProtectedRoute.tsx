@@ -42,3 +42,11 @@ export function PimpinanMenteriRoute({ children }: { children: React.ReactNode }
     </ProtectedRoute>
   );
 }
+
+export function MinisterRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ProtectedRoute requiredRole="menteri" fallbackPath="/admin/dashboard">
+      {children}
+    </ProtectedRoute>
+  );
+}

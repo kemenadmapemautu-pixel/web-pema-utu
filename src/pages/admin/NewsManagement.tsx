@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import '@/styles/quill-custom.css';
 import { 
   Table,
   TableBody,
@@ -621,15 +624,34 @@ export default function NewsManagement() {
               
               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="content">Konten Berita *</Label>
-                <Textarea
-                  id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleChange}
-                  placeholder="Tulis konten lengkap berita..."
-                  rows={8}
-                  required
-                />
+                <div className="border rounded-md">
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.content}
+                    onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                    placeholder="Tulis konten lengkap berita..."
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'font': [] }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'align': [] }],
+                        ['blockquote', 'code-block'],
+                        ['link', 'image', 'video'],
+                        ['clean']
+                      ]
+                    }}
+                    style={{ minHeight: '300px' }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  💡 Gunakan toolbar di atas untuk memformat teks, menambahkan link, gambar, dan lainnya
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

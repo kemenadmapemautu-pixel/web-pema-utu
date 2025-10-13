@@ -4,6 +4,7 @@ import { Calendar, User, Eye, ArrowLeft, Share2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import '@/styles/news-content.css';
 
 interface NewsItem {
   id: string;
@@ -95,8 +96,23 @@ export default function NewsDetail() {
     }
   };
 
+  const isHTMLContent = (content: string) => {
+    // Check if content contains HTML tags
+    return /<[a-z][\s\S]*>/i.test(content);
+  };
+
   const formatContent = (content: string) => {
-    // Format content dengan line breaks dan paragraphs
+    // If content contains HTML (from rich text editor), render as HTML
+    if (isHTMLContent(content)) {
+      return (
+        <div 
+          className="ql-editor-content"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+    
+    // Otherwise, format as plain text with line breaks
     return content.split('\n').map((paragraph, index) => {
       if (paragraph.trim() === '') return null;
       return (
@@ -213,8 +229,8 @@ export default function NewsDetail() {
             </div>
 
             {/* Content */}
-            <div className="prose max-w-none">
-              <div className="text-base leading-relaxed">
+            <div className="prose prose-lg max-w-none">
+              <div className="text-base leading-relaxed news-content">
                 {formatContent(news.content)}
               </div>
             </div>

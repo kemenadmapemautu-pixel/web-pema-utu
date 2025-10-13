@@ -2,8 +2,19 @@ import { ArrowRight, Target, Users, Briefcase, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import heroImage from "@/assets/hero-illustration.png";
+import heroImage from "@/assets/hero-illustration.jpg";
+import { useEffect } from "react";
+import { scrollToSection } from "@/lib/scrollUtils";
+
 export default function Home() {
+  // Auto scroll ke section jika ada parameter dari footer
+  useEffect(() => {
+    const sectionId = sessionStorage.getItem('scrollToSection');
+    if (sectionId) {
+      setTimeout(() => scrollToSection(sectionId), 300);
+      sessionStorage.removeItem('scrollToSection');
+    }
+  }, []);
   const highlights = [{
     icon: Target,
     title: "Visi Jelas",
@@ -23,7 +34,7 @@ export default function Home() {
   }];
   return <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="gradient-hero text-white py-20 lg:py-32 relative overflow-hidden">
+      <section id="beranda" className="gradient-hero text-white py-20 lg:py-32 relative overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
@@ -67,7 +78,7 @@ export default function Home() {
       </section>
 
       {/* Highlights Section */}
-      <section className="py-20 bg-background">
+      <section id="keunggulan" className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-primary">
@@ -98,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Quick Access Section */}
-      <section className="py-20 bg-muted/50">
+      <section id="akses-cepat" className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-primary">

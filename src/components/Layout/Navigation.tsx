@@ -1,18 +1,46 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Home, Users, Target, Briefcase, FileText, Mail, LogIn, LayoutDashboard } from "lucide-react";
+import { Menu, X, Home, Users, Target, Briefcase, FileText, Mail, LogIn, LayoutDashboard, Image, Calendar, Eye, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import pemaLogo from "@/assets/pema-logo.png";
 import kabinetLogo from "@/assets/kabinet-logo.png";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
-const navItems = [{
+// Menu yang ditampilkan di header desktop
+const headerNavItems = [{
   name: "Beranda",
   path: "/",
   icon: Home
 }, {
-  name: "Tentang",
+  name: "Tentang Kami",
+  path: "/about",
+  icon: Target
+}, {
+  name: "Program Kerja",
+  path: "/programs",
+  icon: Briefcase
+}, {
+  name: "Warta Pema",
+  path: "/news",
+  icon: FileText
+}];
+
+// Semua menu (untuk hamburger menu & mobile)
+const allNavItems = [{
+  name: "Beranda",
+  path: "/",
+  icon: Home
+}, {
+  name: "Tentang Kami",
   path: "/about",
   icon: Target
 }, {
@@ -20,9 +48,25 @@ const navItems = [{
   path: "/cabinet",
   icon: Users
 }, {
+  name: "Kementerian",
+  path: "/ministries",
+  icon: Building2
+}, {
+  name: "Visi & Misi",
+  path: "/vision-mission",
+  icon: Eye
+}, {
   name: "Program Kerja",
   path: "/programs",
   icon: Briefcase
+}, {
+  name: "Kegiatan",
+  path: "/activities",
+  icon: Calendar
+}, {
+  name: "Galeri",
+  path: "/gallery",
+  icon: Image
 }, {
   name: "Warta Pema",
   path: "/news",
@@ -34,6 +78,7 @@ const navItems = [{
 }];
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, currentUser } = useAuth();
   return <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -53,13 +98,25 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navItems.map(item => {
-            const isActive = location.pathname === item.path;
-            return <Link key={item.path} to={item.path} className={cn("px-4 py-2 rounded-lg text-sm font-medium transition-smooth relative", isActive ? "text-gold bg-primary/10" : "text-foreground hover:text-gold hover:bg-primary/5")}>
+            {/* Header Menu Items */}
+            {headerNavItems.map(item => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link 
+                  key={item.path} 
+                  to={item.path} 
+                  className={cn(
+                    "px-4 py-2 rounded-lg text-sm font-medium transition-smooth relative", 
+                    isActive 
+                      ? "text-gold bg-primary/10" 
+                      : "text-foreground hover:text-gold hover:bg-primary/5"
+                  )}
+                >
                   {item.name}
                   {isActive && <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gold rounded-full" />}
-                </Link>;
-          })}
+                </Link>
+              );
+            })}
           
           {/* Auth Button */}
           {isAuthenticated ? (
@@ -79,6 +136,45 @@ export function Navigation() {
               <span>Login</span>
             </Link>
           )}
+          
+          {/* Desktop Menu Sheet */}
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" className="ml-2">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Akses semua halaman PEMA UTU
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col space-y-2 mt-6">
+                {allNavItems.map(item => {
+                  const isActive = location.pathname === item.path;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-smooth",
+                        isActive
+                          ? "text-gold bg-primary/10"
+                          : "text-foreground hover:text-gold hover:bg-primary/5"
+                      )}
+                      onClick={() => setIsSheetOpen(false)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,7 +186,7 @@ export function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-2">
-              {navItems.map(item => {
+              {allNavItems.map(item => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
             return <Link key={item.path} to={item.path} className={cn("flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-smooth", isActive ? "text-gold bg-primary/10" : "text-foreground hover:text-gold hover:bg-primary/5")} onClick={() => setIsOpen(false)}>

@@ -27,7 +27,7 @@ git commit -m "Initial commit: PEMA UTU website"
 
 echo.
 echo [4/5] Adding remote repository...
-git remote add origin https://github.com/khavibadrian26/web-interaktif-asyik-.git
+git remote add origin https://github.com/khavibadrian26/web-pema-utu-.git
 
 echo.
 echo [5/5] Pushing to GitHub...
@@ -37,6 +37,6 @@ git push -u origin main
 echo.
 echo ========================================
 echo SUCCESS! Project berhasil di-push ke GitHub
-echo Repository: https://github.com/khavibadrian26/web-interaktif-asyik-
+echo Repository: https://github.com/khavibadrian26/web-pema-utu-
 echo ========================================
 pause

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Image, Play, Calendar, Eye, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,12 @@ interface MediaItem {
   description: string;
   views: number;
   thumbnail: string;
+  url?: string;
+  uploadedBy?: string;
+  createdAt?: string;
 }
 
-const mediaItems: MediaItem[] = [
+const dummyMediaItems: MediaItem[] = [
   {
     id: "1",
     title: "Pelantikan Kabinet Samgrahita 2024",
@@ -111,9 +114,28 @@ const mediaItems: MediaItem[] = [
 const categories = ["Semua", "Pelantikan", "Workshop", "Seminar", "Pengabdian", "Campaign", "Internal", "Entrepreneurship", "Sosial", "Kompetisi"];
 
 export default function Gallery() {
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+
+  // Load gallery items from localStorage
+  useEffect(() => {
+    const savedGallery = localStorage.getItem("galleryItems");
+    if (savedGallery) {
+      try {
+        const parsedGallery = JSON.parse(savedGallery);
+        setMediaItems(parsedGallery);
+      } catch (error) {
+        console.error("Error loading gallery:", error);
+        // Fallback to dummy data
+        setMediaItems(dummyMediaItems);
+      }
+    } else {
+      // Use dummy data if no items in localStorage
+      setMediaItems(dummyMediaItems);
+    }
+  }, []);
 
   const filteredItems = mediaItems.filter(item => {
     const matchesCategory = selectedCategory === "Semua" || item.category === selectedCategory;
@@ -212,14 +234,22 @@ export default function Gallery() {
               onClick={() => setSelectedMedia(item)}
             >
               <div className="relative aspect-video bg-muted rounded-t-lg overflow-hidden">
-                {/* Placeholder for actual image */}
-                <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
-                  {item.type === "image" ? (
-                    <Image className="h-12 w-12 text-white/70" />
-                  ) : (
-                    <Play className="h-12 w-12 text-white/70" />
-                  )}
-                </div>
+                {/* Display actual thumbnail */}
+                {item.thumbnail ? (
+                  <img 
+                    src={item.thumbnail} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-primary flex items-center justify-center">
+                    {item.type === "image" ? (
+                      <Image className="h-12 w-12 text-white/70" />
+                    ) : (
+                      <Play className="h-12 w-12 text-white/70" />
+                    )}
+                  </div>
+                )}
                 
                 {/* Media Type Indicator */}
                 <div className="absolute top-4 right-4">
@@ -289,11 +319,56 @@ export default function Gallery() {
                   </Button>
                 </div>
                 
-                <div className="aspect-video bg-muted rounded-lg mb-6 flex items-center justify-center">
+                <div className="aspect-video bg-muted rounded-lg mb-6 overflow-hidden">
                   {selectedMedia.type === "image" ? (
-                    <Image className="h-16 w-16 text-muted-foreground" />
+                    selectedMedia.thumbnail ? (
+                      <img
+                        src={selectedMedia.thumbnail}
+                        alt={selectedMedia.title}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Image className="h-16 w-16 text-muted-foreground" />
+                      </div>
+                    )
                   ) : (
-                    <Play className="h-16 w-16 text-muted-foreground" />
+                    selectedMedia.url ? (
+                      <div className="w-full h-full">
+                        {selectedMedia.url.includes('youtube.com') || selectedMedia.url.includes('youtu.be') ? (
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src={selectedMedia.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                            title={selectedMedia.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="rounded-lg"
+                          />
+                        ) : (
+                          <video
+                            controls
+                            className="w-full h-full rounded-lg"
+                            src={selectedMedia.url}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        )}
+                      </div>
+                    ) : selectedMedia.thumbnail ? (
+                      <video
+                        controls
+                        className="w-full h-full rounded-lg"
+                        src={selectedMedia.thumbnail}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Play className="h-16 w-16 text-muted-foreground" />
+                      </div>
+                    )
                   )}
                 </div>
                 
