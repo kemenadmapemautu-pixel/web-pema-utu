@@ -130,7 +130,26 @@ export default function NewsManagement() {
   // Save to localStorage whenever list changes (only after initial load)
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("newsList", JSON.stringify(newsList));
+      try {
+        localStorage.setItem("newsList", JSON.stringify(newsList));
+      } catch (error) {
+        console.error("Error saving news to localStorage:", error);
+        
+        // Handle QuotaExceededError
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          toast({
+            title: "Storage Penuh! ⚠️",
+            description: "Tidak dapat menyimpan berita. localStorage penuh. Hapus data lama atau export data.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Error Menyimpan",
+            description: "Gagal menyimpan berita. Coba lagi.",
+            variant: "destructive"
+          });
+        }
+      }
     }
   }, [newsList, isLoaded]);
 
@@ -200,6 +219,23 @@ export default function NewsManagement() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check storage space before adding/updating
+    if (!currentNews) {
+      // Only check for new news (not update)
+      const estimatedSize = JSON.stringify(formData).length;
+      const currentSize = JSON.stringify(newsList).length;
+      const totalEstimated = (estimatedSize + currentSize) / 1024; // KB
+      
+      if (totalEstimated > 4 * 1024) { // > 4MB
+        toast({
+          title: "⚠️ Storage Hampir Penuh",
+          description: `Storage akan mencapai ${(totalEstimated / 1024).toFixed(2)}MB. Backup dan hapus berita lama segera!`,
+          variant: "destructive"
+        });
+        // Continue anyway but warn user
+      }
+    }
+    
     if (currentNews) {
       // Update existing
       const updatedList = newsList.map(n => 
@@ -237,11 +273,12 @@ export default function NewsManagement() {
   };
 
   const processImageFile = (file: File) => {
-    // Validasi ukuran file (maksimal 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validasi ukuran file - DIKURANGI ke 1MB untuk mencegah localStorage penuh
+    const maxSize = 1 * 1024 * 1024; // 1MB
+    if (file.size > maxSize) {
       toast({
-        title: "File terlalu besar",
-        description: "Ukuran file maksimal 5MB",
+        title: "File terlalu besar ❌",
+        description: `Ukuran maksimal 1MB. File Anda: ${(file.size / 1024 / 1024).toFixed(2)}MB. Compress dulu dengan TinyPNG.com`,
         variant: "destructive"
       });
       return;
@@ -257,19 +294,41 @@ export default function NewsManagement() {
       return;
     }
 
+    // Warning untuk file > 500KB
+    if (file.size > 500 * 1024) {
+      toast({
+        title: "⚠️ File Cukup Besar",
+        description: `File ${(file.size / 1024).toFixed(0)}KB. Untuk performa terbaik, gunakan file < 500KB`,
+      });
+    }
+
     // Convert file to base64 untuk preview dan storage
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64String = event.target?.result as string;
+      
+      // Cek ukuran base64 (sekitar 1.3x dari file size)
+      const base64Size = new Blob([base64String]).size;
+      console.log(`Image size: ${(file.size / 1024).toFixed(2)}KB → Base64: ${(base64Size / 1024).toFixed(2)}KB`);
+      
       setFormData(prev => ({
         ...prev,
         image: base64String
       }));
       toast({
-        title: "Berhasil!",
+        title: "Berhasil! ✅",
         description: "Gambar berhasil diupload"
       });
     };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Error",
+        description: "Gagal membaca file. Coba lagi.",
+        variant: "destructive"
+      });
+    };
+    
     reader.readAsDataURL(file);
   };
 
@@ -335,6 +394,19 @@ export default function NewsManagement() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        {/* Storage Info Banner */}
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+          <p className="text-sm text-yellow-800 font-medium mb-1">⚠️ Penting: Batasan Penyimpanan</p>
+          <p className="text-xs text-yellow-700 mb-2">
+            <strong>Gambar disimpan sebagai base64 di localStorage (max ~5MB total).</strong> 
+            Jika storage penuh, berita baru TIDAK akan tersimpan dan muncul blank page.
+          </p>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>✅ <strong>Rekomendasi:</strong> Gunakan gambar {'<'} 500KB, compress di TinyPNG.com</div>
+            <div>🔧 <strong>Jika error:</strong> Hapus berita lama atau export data di menu "Kelola Penyimpanan"</div>
+          </div>
+        </div>
+
         <Card className="shadow-lg">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -569,7 +641,11 @@ export default function NewsManagement() {
                   </label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  📷 Format: JPG, PNG, GIF | Maksimal: 5MB
+                  📷 Format: JPG, PNG, GIF | <strong>Maksimal: 1MB</strong> (Compress di <a href="https://tinypng.com" target="_blank" className="text-blue-600 underline">TinyPNG.com</a>)
+                </p>
+                <p className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded mt-1">
+                  ⚠️ <strong>Penting:</strong> Gambar disimpan sebagai base64 di localStorage. 
+                  File besar bisa menyebabkan storage penuh dan berita tidak tersimpan.
                 </p>
                 
                 {/* Preview Gambar */}

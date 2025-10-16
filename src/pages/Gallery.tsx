@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Image, Play, Calendar, Eye, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useGallery } from "@/contexts/GalleryContext";
 
 interface MediaItem {
   id: string;
@@ -114,28 +115,16 @@ const dummyMediaItems: MediaItem[] = [
 const categories = ["Semua", "Pelantikan", "Workshop", "Seminar", "Pengabdian", "Campaign", "Internal", "Entrepreneurship", "Sosial", "Kompetisi"];
 
 export default function Gallery() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  // PERBAIKAN: Gunakan Context untuk mendapatkan data dari admin
+  const { galleryItems: mediaItems } = useGallery();
+  
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
 
-  // Load gallery items from localStorage
-  useEffect(() => {
-    const savedGallery = localStorage.getItem("galleryItems");
-    if (savedGallery) {
-      try {
-        const parsedGallery = JSON.parse(savedGallery);
-        setMediaItems(parsedGallery);
-      } catch (error) {
-        console.error("Error loading gallery:", error);
-        // Fallback to dummy data
-        setMediaItems(dummyMediaItems);
-      }
-    } else {
-      // Use dummy data if no items in localStorage
-      setMediaItems(dummyMediaItems);
-    }
-  }, []);
+  // Debug: Log jumlah items
+  console.log("Gallery - Total items:", mediaItems.length);
+  console.log("Gallery - Items:", mediaItems);
 
   const filteredItems = mediaItems.filter(item => {
     const matchesCategory = selectedCategory === "Semua" || item.category === selectedCategory;
@@ -168,20 +157,20 @@ export default function Gallery() {
   };
 
   return (
-    <div className="min-h-screen py-20">
+    <div className="min-h-screen py-16 md:py-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center space-y-4 mb-16">
-          <h1 className="text-4xl lg:text-5xl font-bold text-primary">
+        <div className="text-center space-y-3 mb-10">
+          <h1 className="text-3xl lg:text-4xl font-bold text-primary">
             Galeri <span className="text-gradient-accent">Media</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
             Dokumentasi visual dari berbagai kegiatan dan program PEMA UTU Kabinet Samgrahita.
           </p>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-12">
+        <div className="flex flex-col lg:flex-row gap-3 mb-8">
           <div className="flex-1">
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
@@ -226,8 +215,24 @@ export default function Gallery() {
         </div>
 
         {/* Media Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map((item) => (
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+              <Image className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-bold text-primary mb-2">Galeri Masih Kosong</h3>
+            <p className="text-muted-foreground mb-4">
+              {mediaItems.length === 0 
+                ? "Belum ada media yang diupload. Admin dapat menambahkan foto dan video melalui dashboard."
+                : "Tidak ada media yang sesuai dengan filter yang dipilih."}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Total media tersedia: <strong>{mediaItems.length}</strong>
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-5">
+            {filteredItems.map((item) => (
             <Card 
               key={item.id} 
               className="shadow-card hover:shadow-primary transition-smooth group cursor-pointer"
@@ -252,74 +257,67 @@ export default function Gallery() {
                 )}
                 
                 {/* Media Type Indicator */}
-                <div className="absolute top-4 right-4">
-                  <div className="w-8 h-8 bg-black/50 rounded-full flex items-center justify-center">
+                <div className="absolute top-2 right-2">
+                  <div className="w-7 h-7 bg-black/50 rounded-full flex items-center justify-center">
                     {item.type === "image" ? (
-                      <Image className="h-4 w-4 text-white" />
+                      <Image className="h-3.5 w-3.5 text-white" />
                     ) : (
-                      <Play className="h-4 w-4 text-white" />
+                      <Play className="h-3.5 w-3.5 text-white" />
                     )}
                   </div>
                 </div>
                 
                 {/* Views Counter */}
-                <div className="absolute bottom-4 right-4">
-                  <div className="bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                <div className="absolute bottom-2 right-2">
+                  <div className="bg-black/50 text-white text-xs px-2 py-0.5 rounded-full flex items-center space-x-1">
                     <Eye className="h-3 w-3" />
                     <span>{item.views.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
               
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 space-y-2">
                 <div className="flex items-start justify-between">
-                  <Badge className={getCategoryColor(item.category)}>
+                  <Badge className={`${getCategoryColor(item.category)} text-xs`}>
                     {item.category}
                   </Badge>
                   <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                     <Calendar className="h-3 w-3" />
-                    <span>{formatDate(item.date)}</span>
+                    <span className="text-xs">{formatDate(item.date)}</span>
                   </div>
                 </div>
                 
-                <h3 className="text-lg font-semibold text-primary group-hover:text-gold transition-smooth line-clamp-2">
+                <h3 className="text-sm sm:text-base font-semibold text-primary group-hover:text-gold transition-smooth line-clamp-2">
                   {item.title}
                 </h3>
                 
-                <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
+                <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                   {item.description}
                 </p>
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredItems.length === 0 && (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-primary mb-2">Tidak ada media ditemukan</h3>
-            <p className="text-muted-foreground">Coba ubah filter kategori atau tipe media untuk melihat konten lainnya.</p>
           </div>
         )}
 
         {/* Media Detail Modal */}
         {selectedMedia && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedMedia(null)}>
-            <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="space-y-2">
-                    <Badge className={getCategoryColor(selectedMedia.category)}>
+            <div className="bg-background rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="p-5 sm:p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="space-y-1.5">
+                    <Badge className={`${getCategoryColor(selectedMedia.category)} text-xs`}>
                       {selectedMedia.category}
                     </Badge>
-                    <h2 className="text-2xl font-bold text-primary">{selectedMedia.title}</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-primary">{selectedMedia.title}</h2>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setSelectedMedia(null)}>
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
                 
-                <div className="aspect-video bg-muted rounded-lg mb-6 overflow-hidden">
+                <div className="aspect-video bg-muted rounded-lg mb-4 overflow-hidden">
                   {selectedMedia.type === "image" ? (
                     selectedMedia.thumbnail ? (
                       <img
@@ -372,17 +370,17 @@ export default function Gallery() {
                   )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold text-primary mb-3">Deskripsi</h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <h3 className="text-base font-semibold text-primary mb-2">Deskripsi</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {selectedMedia.description}
                     </p>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
-                      <h4 className="font-semibold text-primary mb-2">Detail Media</h4>
+                      <h4 className="text-sm font-semibold text-primary mb-2">Detail Media</h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Tanggal:</span>
@@ -408,32 +406,6 @@ export default function Gallery() {
             </div>
           </div>
         )}
-
-        {/* Call to Action */}
-        <div className="mt-20">
-          <Card className="gradient-primary text-white p-8 text-center">
-            <CardContent className="space-y-6">
-              <h2 className="text-3xl font-bold">Bagikan Momen Anda</h2>
-              <p className="text-lg text-white/80 max-w-2xl mx-auto">
-                Punya dokumentasi kegiatan PEMA UTU? Kirimkan kepada kami untuk ditampilkan di galeri media.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a 
-                  href="mailto:media@pema.utu.ac.id" 
-                  className="bg-gold text-primary px-6 py-3 rounded-lg font-semibold hover:bg-gold-dark transition-smooth"
-                >
-                  Kirim Media
-                </a>
-                <a 
-                  href="/contact" 
-                  className="border border-white/30 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-smooth"
-                >
-                  Hubungi Tim Media
-                </a>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

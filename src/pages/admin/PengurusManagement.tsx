@@ -845,10 +845,18 @@ export default function PengurusManagement() {
   };
 
   const removeFromLoginSystem = (pengurusId: string) => {
-    // Remove from accounts (for login)
-    const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-    const updatedAccounts = accounts.filter((u: any) => u.id !== pengurusId);
-    localStorage.setItem("accounts", JSON.stringify(updatedAccounts));
+    try {
+      // Remove from accounts (for login)
+      const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+      if (!Array.isArray(accounts)) {
+        console.error("accounts is not an array");
+        return;
+      }
+      const updatedAccounts = accounts.filter((u: any) => u.id !== pengurusId);
+      localStorage.setItem("accounts", JSON.stringify(updatedAccounts));
+    } catch (error) {
+      console.error("Error removing from login system:", error);
+    }
   };
 
   // Generate username otomatis
@@ -953,28 +961,38 @@ export default function PengurusManagement() {
   const syncWithLoginSystem = (pengurus: Pengurus) => {
     if (!pengurus.username || !pengurus.password) return;
 
-    const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-    
-    // Cek apakah user sudah ada
-    const existingUserIndex = accounts.findIndex((u: any) => u.id === pengurus.id);
-    
-    const userData = {
-      id: pengurus.id,
-      username: pengurus.username,
-      password: pengurus.password,
-      role: pengurus.tipe,
-      name: pengurus.nama,
-      position: pengurus.jabatan,
-      department: pengurus.departemen || ""
-    };
+    try {
+      const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+      
+      // Validate array
+      if (!Array.isArray(accounts)) {
+        console.error("accounts is not an array");
+        return;
+      }
+      
+      // Cek apakah user sudah ada
+      const existingUserIndex = accounts.findIndex((u: any) => u.id === pengurus.id);
+      
+      const userData = {
+        id: pengurus.id,
+        username: pengurus.username,
+        password: pengurus.password,
+        role: pengurus.tipe,
+        name: pengurus.nama,
+        position: pengurus.jabatan,
+        department: pengurus.departemen || ""
+      };
 
-    if (existingUserIndex >= 0) {
-      accounts[existingUserIndex] = userData;
-    } else {
-      accounts.push(userData);
+      if (existingUserIndex >= 0) {
+        accounts[existingUserIndex] = userData;
+      } else {
+        accounts.push(userData);
+      }
+
+      localStorage.setItem("accounts", JSON.stringify(accounts));
+    } catch (error) {
+      console.error("Error syncing with login system:", error);
     }
-
-    localStorage.setItem("accounts", JSON.stringify(accounts));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

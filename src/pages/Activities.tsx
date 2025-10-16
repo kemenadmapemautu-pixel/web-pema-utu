@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, MapPin, Users, ExternalLink, Filter } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,93 +19,23 @@ interface Activity {
   registrationLink?: string;
 }
 
-const activities: Activity[] = [
-  {
-    id: "1",
-    title: "Workshop Digital Marketing untuk UMKM",
-    description: "Pelatihan digital marketing gratis untuk mahasiswa dan masyarakat umum yang ingin mengembangkan bisnis online.",
-    date: "2024-04-15",
-    time: "09:00 - 16:00",
-    location: "Aula Utama UTU",
-    category: "Workshop",
-    participants: 45,
-    maxParticipants: 100,
-    status: "upcoming",
-    organizer: "Divisi Kewirausahaan",
-    registrationLink: "#"
-  },
-  {
-    id: "2",
-    title: "Seminar Nasional Teknologi Pendidikan",
-    description: "Diskusi tentang pemanfaatan teknologi dalam dunia pendidikan dengan pembicara dari berbagai universitas ternama.",
-    date: "2024-04-10",
-    time: "08:00 - 17:00",
-    location: "Gedung Convention Center",
-    category: "Seminar",
-    participants: 200,
-    maxParticipants: 300,
-    status: "ongoing",
-    organizer: "Divisi Pendidikan",
-    registrationLink: "#"
-  },
-  {
-    id: "3",
-    title: "Bakti Sosial Ramadan",
-    description: "Kegiatan berbagi takjil dan santunan kepada masyarakat kurang mampu di sekitar kampus.",
-    date: "2024-03-28",
-    time: "16:00 - 19:00",
-    location: "Masjid Al-Hikmah UTU",
-    category: "Sosial",
-    participants: 150,
-    status: "completed",
-    organizer: "Divisi Kemahasiswaan"
-  },
-  {
-    id: "4",
-    title: "Kompetisi Inovasi Teknologi",
-    description: "Lomba untuk menciptakan solusi teknologi yang dapat memecahkan masalah sosial di lingkungan sekitar.",
-    date: "2024-04-20",
-    time: "08:00 - 17:00",
-    location: "Lab Komputer Fakultas Teknik",
-    category: "Kompetisi",
-    participants: 25,
-    maxParticipants: 50,
-    status: "upcoming",
-    organizer: "Divisi Teknologi",
-    registrationLink: "#"
-  },
-  {
-    id: "5",
-    title: "Talkshow Kesehatan Mental",
-    description: "Diskusi interaktif tentang pentingnya menjaga kesehatan mental di kalangan mahasiswa.",
-    date: "2024-04-05",
-    time: "13:00 - 16:00",
-    location: "Ruang Serbaguna",
-    category: "Talkshow",
-    participants: 80,
-    maxParticipants: 120,
-    status: "ongoing",
-    organizer: "Divisi Kesejahteraan"
-  },
-  {
-    id: "6",
-    title: "Pelatihan Kepemimpinan Mahasiswa",
-    description: "Program pengembangan soft skill kepemimpinan untuk mahasiswa yang aktif di organisasi.",
-    date: "2024-03-25",
-    time: "09:00 - 17:00",
-    location: "Gedung Student Center",
-    category: "Pelatihan",
-    participants: 60,
-    status: "completed",
-    organizer: "Divisi Pengembangan SDM"
-  }
-];
-
 const categories = ["Semua", "Workshop", "Seminar", "Kompetisi", "Talkshow", "Pelatihan", "Sosial"];
 
 export default function Activities() {
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("activities");
+    if (saved) {
+      try {
+        setActivities(JSON.parse(saved));
+      } catch (error) {
+        console.error("Error parsing activities:", error);
+      }
+    }
+  }, []);
 
   const filteredActivities = activities.filter(activity => {
     const matchesCategory = selectedCategory === "Semua" || activity.category === selectedCategory;
@@ -288,7 +218,7 @@ export default function Activities() {
             <CardContent className="space-y-6">
               <h2 className="text-3xl font-bold">Punya Ide Kegiatan?</h2>
               <p className="text-lg text-white/80 max-w-2xl mx-auto">
-                Kami selalu terbuka untuk ide kegiatan baru yang bermanfaat bagi mahasiswa dan masyarakat. 
+                Kami selalu terbuka untuk ide kegiatan baru dan kerjasama yang bermanfaat bagi mahasiswa dan masyarakat. 
                 Sampaikan proposal kegiatan Anda kepada kami!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

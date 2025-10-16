@@ -49,27 +49,44 @@ export default function AccountManagement() {
   }, []);
 
   const loadAccounts = () => {
-    const loginUsers = JSON.parse(localStorage.getItem("loginUsers") || "[]");
-    const pengurusList = JSON.parse(localStorage.getItem("pengurusList") || "[]");
-    
-    // Combine data from both sources
-    const accountsData: AccountData[] = loginUsers
-      .filter((user: any) => user.role !== "admin")
-      .map((user: any) => {
-        const pengurusData = pengurusList.find((p: any) => p.id === user.id);
-        return {
-          id: user.id,
-          nama: user.name,
-          jabatan: user.position,
-          username: user.username,
-          password: user.password,
-          role: user.role,
-          profileCompleted: pengurusData?.profileCompleted || false,
-          createdAt: new Date().toISOString() // In real app, this would be stored
-        };
-      });
+    try {
+      const loginUsers = JSON.parse(localStorage.getItem("loginUsers") || "[]");
+      const pengurusList = JSON.parse(localStorage.getItem("pengurusList") || "[]");
+      
+      // Validate arrays
+      if (!Array.isArray(loginUsers) || !Array.isArray(pengurusList)) {
+        console.error("Invalid data format in localStorage");
+        setAccounts([]);
+        return;
+      }
+      
+      // Combine data from both sources
+      const accountsData: AccountData[] = loginUsers
+        .filter((user: any) => user.role !== "admin")
+        .map((user: any) => {
+          const pengurusData = pengurusList.find((p: any) => p.id === user.id);
+          return {
+            id: user.id,
+            nama: user.name,
+            jabatan: user.position,
+            username: user.username,
+            password: user.password,
+            role: user.role,
+            profileCompleted: pengurusData?.profileCompleted || false,
+            createdAt: new Date().toISOString() // In real app, this would be stored
+          };
+        });
 
-    setAccounts(accountsData);
+      setAccounts(accountsData);
+    } catch (error) {
+      console.error("Error loading accounts:", error);
+      setAccounts([]);
+      toast({
+        title: "Error",
+        description: "Gagal memuat data akun. Data mungkin rusak.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleLogout = () => {

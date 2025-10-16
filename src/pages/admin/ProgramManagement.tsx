@@ -447,48 +447,6 @@ export default function ProgramManagement() {
                     className="pl-10 w-full sm:w-64"
                   />
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    // Example: Add a sample program with custom publish date
-                    const sampleProgram: Program = {
-                      id: Date.now().toString(),
-                      nama: "Program Beasiswa Sample",
-                      deskripsi: "Program beasiswa untuk mahasiswa berprestasi dengan tanggal publikasi custom",
-                      status: "sedang_berjalan",
-                      createdAt: new Date().toISOString(),
-                      publishedDate: "2025-01-15", // Custom publish date
-                      publishedBy: "Admin PEMA UTU"
-                    };
-                    
-                    const existingPrograms = JSON.parse(localStorage.getItem("programsList") || "[]");
-                    const updatedPrograms = [...existingPrograms, sampleProgram];
-                    localStorage.setItem("programsList", JSON.stringify(updatedPrograms));
-                    setPrograms(updatedPrograms);
-                    
-                    toast({
-                      title: "Sample Program Ditambahkan",
-                      description: "Program dengan tanggal publikasi custom (15 Januari 2025) telah ditambahkan"
-                    });
-                  }}
-                  className="mr-2"
-                >
-                  ➕ Sample Program
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    localStorage.removeItem("programsList");
-                    setPrograms([]);
-                    toast({
-                      title: "Data Direset",
-                      description: "Semua program telah dihapus untuk testing"
-                    });
-                  }}
-                  className="mr-2"
-                >
-                  Reset Data
-                </Button>
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                   <DialogTrigger asChild>
                     <Button onClick={handleAdd}>

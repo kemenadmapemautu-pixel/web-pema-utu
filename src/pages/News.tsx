@@ -116,20 +116,20 @@ export default function News() {
   };
 
   return (
-    <div className="min-h-screen py-20">
+    <div className="min-h-screen py-16 md:py-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center space-y-4 mb-16">
-          <h1 className="text-4xl lg:text-5xl font-bold text-primary">
+        <div className="text-center space-y-3 mb-10">
+          <h1 className="text-3xl lg:text-4xl font-bold text-primary">
             Warta <span className="text-gradient-accent">Pema</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
             Ikuti perkembangan terbaru kegiatan PEMA UTU dan berbagai program yang sedang berlangsung.
           </p>
         </div>
 
         {/* Search and Filter */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-12">
+        <div className="flex flex-col lg:flex-row gap-3 mb-8">
           <div className="flex-1">
             <Input
               placeholder="Cari berita..."
@@ -155,9 +155,9 @@ export default function News() {
 
         {/* Featured News */}
         {featuredNews.length > 0 && (
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold text-primary mb-8">Berita Utama</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-primary mb-5">Berita Utama</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {featuredNews.map((news) => (
                 <Card 
                   key={news.id} 
@@ -178,14 +178,14 @@ export default function News() {
                       </div>
                     </div>
                   )}
-                  <CardContent className="p-6 space-y-4">
+                  <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <Badge className={getCategoryColor(news.category)}>
+                      <Badge className={`${getCategoryColor(news.category)} text-xs`}>
                         {news.category}
                       </Badge>
-                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-3 text-xs text-muted-foreground">
                         <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
+                          <Calendar className="h-3.5 w-3.5" />
                           <span>
                             Diterbitkan oleh {news.publishedBy || "Administrator"} pada {
                               news.publishedDate ? 
@@ -195,26 +195,26 @@ export default function News() {
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3.5 w-3.5" />
                           <span>{news.views}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <h3 className="text-xl font-semibold text-primary group-hover:text-gold transition-smooth">
+                    <h3 className="text-base sm:text-lg font-semibold text-primary group-hover:text-gold transition-smooth">
                       {news.title}
                     </h3>
                     
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {news.excerpt}
                     </p>
                     
-                    <div className="flex items-center justify-between pt-4">
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <User className="h-4 w-4" />
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <User className="h-3.5 w-3.5" />
                         <span>{news.author}</span>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-gold group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="h-4 w-4 text-gold group-hover:translate-x-1 transition-transform" />
                     </div>
                   </CardContent>
                 </Card>
@@ -225,8 +225,8 @@ export default function News() {
 
         {regularNews.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-primary mb-8">Berita Lainnya</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <h2 className="text-xl font-bold text-primary mb-5">Berita Lainnya</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-5">
               {regularNews.map((news) => (
                 <Card 
                   key={news.id} 
@@ -248,9 +248,9 @@ export default function News() {
                     </div>
                   )}
                   
-                  <CardHeader className="space-y-3">
+                  <CardHeader className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Badge className={getCategoryColor(news.category)}>
+                      <Badge className={`${getCategoryColor(news.category)} text-xs`}>
                         {news.category}
                       </Badge>
                       <div className="flex items-center space-x-1 text-xs text-muted-foreground">
@@ -258,13 +258,13 @@ export default function News() {
                         <span>{news.views}</span>
                       </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-primary group-hover:text-gold transition-smooth line-clamp-2">
+                    <h3 className="text-sm sm:text-base font-semibold text-primary group-hover:text-gold transition-smooth line-clamp-2">
                       {news.title}
                     </h3>
                   </CardHeader>
                   
-                  <CardContent className="space-y-4">
-                    <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3">
+                  <CardContent className="space-y-3">
+                    <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">
                       {news.excerpt}
                     </p>
                     
@@ -292,8 +292,8 @@ export default function News() {
 
         {/* Empty State */}
         {filteredNews.length === 0 && (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-primary mb-2">Tidak ada berita ditemukan</h3>
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold text-primary mb-2">Tidak ada berita ditemukan</h3>
             <p className="text-muted-foreground">Coba ubah kategori atau kata kunci pencarian Anda.</p>
           </div>
         )}

@@ -50,15 +50,6 @@ interface Minister {
   };
 }
 
-interface MinistryPageProps {
-  ministryKey: string;
-  ministryName: string;
-  description: string;
-  vision: string;
-  mission: string[];
-  programs: string[];
-}
-
 interface MinistryContent {
   ministryId: string;
   ministryName: string;
@@ -68,29 +59,52 @@ interface MinistryContent {
   programs: string[];
 }
 
-export default function MinistryPage({ 
-  ministryKey, 
-  ministryName, 
-  description: defaultDescription, 
-  vision: defaultVision, 
-  mission: defaultMission,
-  programs: defaultPrograms 
-}: MinistryPageProps) {
+export default function MinistryPage() {
+  const { slug } = useParams<{ slug: string }>();
   const [minister, setMinister] = useState<Minister | null>(null);
   const [teamData, setTeamData] = useState<MinistryTeam | null>(null);
   const [content, setContent] = useState({
-    description: defaultDescription,
-    vision: defaultVision,
-    mission: defaultMission,
-    programs: defaultPrograms
+    description: "",
+    vision: "",
+    mission: [] as string[],
+    programs: [] as string[]
   });
   const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
 
+  // Get ministry data from slug
+  const getMinistryDataFromSlug = () => {
+    // Map slug to ministry name and default content
+    const ministryMap: Record<string, { name: string, description: string, vision: string, mission: string[], programs: string[] }> = {
+      'advokasi-hak-mahasiswa': {
+        name: 'Advokasi dan Hak Mahasiswa',
+        description: 'Kementerian yang membela dan memperjuangkan hak-hak mahasiswa',
+        vision: 'Menjadi wadah aspirasi mahasiswa yang tanggap dan proaktif',
+        mission: ['Membela hak mahasiswa', 'Menyuarakan aspirasi', 'Memberikan solusi'],
+        programs: ['Advokasi Akademik', 'Konsultasi Mahasiswa']
+      },
+      // Add other ministries as needed
+    };
+    
+    return slug ? ministryMap[slug] : null;
+  };
+
+  const ministryData = getMinistryDataFromSlug();
+  const ministryName = ministryData?.name || '';
+  const ministryKey = slug || '';
+
   useEffect(() => {
+    if (ministryData) {
+      setContent({
+        description: ministryData.description,
+        vision: ministryData.vision,
+        mission: ministryData.mission,
+        programs: ministryData.programs
+      });
+    }
     loadMinisterData();
     loadTeamData();
     loadCustomContent();
-  }, [ministryKey, ministryName]);
+  }, [slug]);
 
   const loadMinisterData = () => {
     const savedPengurus = localStorage.getItem("pengurusList");

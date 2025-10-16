@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGallery } from "@/contexts/GalleryContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,9 @@ const categories = [
 ];
 
 export default function GalleryManagement() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  // PERBAIKAN: Gunakan Context untuk shared state dengan halaman Gallery publik
+  const { galleryItems, addItem, updateItem, deleteItem, clearAll } = useGallery();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedType, setSelectedType] = useState<"all" | "image" | "video">("all");
@@ -82,6 +85,7 @@ export default function GalleryManagement() {
   const [currentItem, setCurrentItem] = useState<GalleryItem | null>(null);
   const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const [formData, setFormData] = useState<GalleryItem>({
     id: "",
@@ -101,27 +105,11 @@ export default function GalleryManagement() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // PERBAIKAN: Data sekarang dikelola oleh GalleryContext
+  // Tidak perlu useEffect untuk load/save data
   useEffect(() => {
-    loadGalleryItems();
+    // Component initialization
   }, []);
-
-  const loadGalleryItems = () => {
-    const savedData = localStorage.getItem("galleryItems");
-    if (savedData) {
-      try {
-        setGalleryItems(JSON.parse(savedData));
-      } catch (error) {
-        console.error("Error parsing gallery data:", error);
-        setGalleryItems([]);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (galleryItems.length > 0) {
-      localStorage.setItem("galleryItems", JSON.stringify(galleryItems));
-    }
-  }, [galleryItems]);
 
   const handleLogout = () => {
     logout();
@@ -163,9 +151,8 @@ export default function GalleryManagement() {
 
   const confirmDelete = () => {
     if (currentItem) {
-      const updatedList = galleryItems.filter(item => item.id !== currentItem.id);
-      setGalleryItems(updatedList);
-      localStorage.setItem("galleryItems", JSON.stringify(updatedList));
+      // PERBAIKAN: Gunakan deleteItem dari context (sudah handle cleanup Object URL)
+      deleteItem(currentItem.id);
       
       toast({
         title: "Berhasil Dihapus! 🗑️",
@@ -173,6 +160,18 @@ export default function GalleryManagement() {
       });
       setIsDeleteDialogOpen(false);
       setCurrentItem(null);
+    }
+  };
+
+  const handleClearAll = () => {
+    if (window.confirm("⚠️ Apakah Anda yakin ingin menghapus SEMUA media di galeri?\n\nTindakan ini tidak dapat dibatalkan!")) {
+      // PERBAIKAN: Gunakan clearAll dari context (sudah handle cleanup Object URL)
+      clearAll();
+      
+      toast({
+        title: "Galeri Dikosongkan! 🗑️",
+        description: "Semua foto dan video telah dihapus dari galeri"
+      });
     }
   };
 
@@ -188,15 +187,27 @@ export default function GalleryManagement() {
       return;
     }
 
-    if (!formData.thumbnail && uploadMethod === "file" && !isEditing) {
+    // Validasi untuk image
+    if (formData.type === "image" && !formData.thumbnail && uploadMethod === "file" && !isEditing) {
       toast({
         title: "File Belum Diupload",
-        description: "Mohon upload file gambar/video",
+        description: "Mohon upload file gambar",
         variant: "destructive"
       });
       return;
     }
 
+    // Validasi untuk video file upload
+    if (formData.type === "video" && uploadMethod === "file" && !formData.url && !isEditing) {
+      toast({
+        title: "Video Belum Diupload",
+        description: "Mohon upload file video",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validasi untuk video URL
     if (formData.type === "video" && uploadMethod === "url" && !formData.thumbnail && !isEditing) {
       toast({
         title: "Thumbnail Belum Diupload",
@@ -216,19 +227,15 @@ export default function GalleryManagement() {
     }
 
     if (isEditing && currentItem) {
-      // Update existing item
-      const updatedItems = galleryItems.map(item => 
-        item.id === currentItem.id ? { ...formData, id: currentItem.id } : item
-      );
-      setGalleryItems(updatedItems);
-      localStorage.setItem("galleryItems", JSON.stringify(updatedItems));
+      // PERBAIKAN: Update menggunakan context
+      updateItem(currentItem.id, { ...formData, id: currentItem.id });
       
       toast({
         title: "Berhasil Diperbarui! ✅",
         description: `${formData.type === "image" ? "Foto" : "Video"} berhasil diperbarui`
       });
     } else {
-      // Add new item
+      // PERBAIKAN: Add menggunakan context
       const newItem = {
         ...formData,
         id: Date.now().toString(),
@@ -236,9 +243,7 @@ export default function GalleryManagement() {
         createdAt: new Date().toISOString()
       };
 
-      const updatedItems = [...galleryItems, newItem];
-      setGalleryItems(updatedItems);
-      localStorage.setItem("galleryItems", JSON.stringify(updatedItems));
+      addItem(newItem);
       
       toast({
         title: "Berhasil Ditambahkan! ✅",
@@ -274,12 +279,16 @@ export default function GalleryManagement() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    setIsUploading(true);
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
+    // Validate file size based on type
+    const maxSize = formData.type === "video" && uploadMethod === "file" ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setIsUploading(false);
       toast({
         title: "File Terlalu Besar",
-        description: "Ukuran file maksimal 10MB",
+        description: `Ukuran file maksimal ${maxSize / (1024 * 1024)}MB. File Anda: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
         variant: "destructive"
       });
       return;
@@ -292,6 +301,7 @@ export default function GalleryManagement() {
     // Untuk thumbnail video dengan URL method, hanya terima gambar
     if (formData.type === "video" && uploadMethod === "url") {
       if (!validImageTypes.includes(file.type)) {
+        setIsUploading(false);
         toast({
           title: "Format Tidak Valid",
           description: "Upload gambar untuk thumbnail: JPG, PNG, GIF, WEBP",
@@ -302,6 +312,7 @@ export default function GalleryManagement() {
     }
     // Untuk image type, hanya terima gambar
     else if (formData.type === "image" && !validImageTypes.includes(file.type)) {
+      setIsUploading(false);
       toast({
         title: "Format Tidak Valid",
         description: "Format gambar: JPG, PNG, GIF, WEBP",
@@ -312,6 +323,7 @@ export default function GalleryManagement() {
     // Untuk video dengan file upload, terima video atau gambar (untuk thumbnail)
     else if (formData.type === "video" && uploadMethod === "file") {
       if (!validImageTypes.includes(file.type) && !validVideoTypes.includes(file.type)) {
+        setIsUploading(false);
         toast({
           title: "Format Tidak Valid",
           description: "Format: JPG, PNG, GIF, WEBP (thumbnail) atau MP4, WEBM, OGG (video)",
@@ -321,19 +333,46 @@ export default function GalleryManagement() {
       }
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64String = event.target?.result as string;
+    // PERBAIKAN: Gunakan Object URL untuk semua file (tidak lagi base64)
+    // Object URL lebih efisien dan tidak menyebabkan QuotaExceededError
+    
+    if (formData.type === "video" && uploadMethod === "file" && validVideoTypes.includes(file.type)) {
+      // Video file - gunakan Object URL
+      const videoUrl = URL.createObjectURL(file);
       setFormData(prev => ({
         ...prev,
-        thumbnail: base64String
+        url: videoUrl,
+        thumbnail: "" // Will need separate thumbnail upload
       }));
+      setIsUploading(false);
       toast({
-        title: "File Berhasil Diupload! ✅",
-        description: `${formData.type === "image" ? "Gambar" : "Video"} berhasil diupload`
+        title: "Video Berhasil Diupload! ✅",
+        description: "Video berhasil diupload. Upload thumbnail untuk preview yang lebih baik."
       });
-    };
-    reader.readAsDataURL(file);
+    } else {
+      // PERBAIKAN: Untuk gambar/thumbnail, gunakan Object URL (bukan base64)
+      // Ini mencegah QuotaExceededError karena tidak menyimpan data besar
+      try {
+        const imageUrl = URL.createObjectURL(file);
+        setFormData(prev => ({
+          ...prev,
+          thumbnail: imageUrl
+        }));
+        setIsUploading(false);
+        toast({
+          title: "File Berhasil Diupload! ✅",
+          description: `${formData.type === "image" ? "Gambar" : "Thumbnail"} berhasil diupload`
+        });
+      } catch (error) {
+        console.error("Error processing file:", error);
+        setIsUploading(false);
+        toast({
+          title: "Error Upload",
+          description: "Gagal memproses file. Silakan coba lagi.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -398,6 +437,15 @@ export default function GalleryManagement() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        {/* Info untuk admin */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800 font-medium mb-1">ℹ️ Informasi Penting</p>
+          <p className="text-xs text-blue-700">
+            Data galeri disimpan di localStorage browser. File gambar/video menggunakan Object URL yang lebih efisien. 
+            Untuk penyimpanan permanen dan file besar, disarankan menggunakan backend API dengan cloud storage.
+          </p>
+        </div>
+        
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card>
@@ -454,10 +502,18 @@ export default function GalleryManagement() {
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <CardTitle className="text-xl">Galeri Media</CardTitle>
-              <Button onClick={handleAdd} className="bg-gold hover:bg-gold/90">
-                <Plus className="h-4 w-4 mr-2" />
-                Tambah Media
-              </Button>
+              <div className="flex gap-2">
+                {galleryItems.length > 0 && (
+                  <Button onClick={handleClearAll} variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Kosongkan Semua
+                  </Button>
+                )}
+                <Button onClick={handleAdd} className="bg-gold hover:bg-gold/90">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Tambah Media
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -666,65 +722,200 @@ export default function GalleryManagement() {
 
               {/* File Upload */}
               {uploadMethod === "file" && (
-                <div className="space-y-2">
-                  <Label htmlFor="file">Upload {formData.type === "image" ? "Foto" : "Video"} *</Label>
-                  <div 
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                  >
-                    <input
-                      type="file"
-                      id="file"
-                      accept={formData.type === "image" ? "image/*" : "video/*"}
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <label 
-                      htmlFor="file" 
-                      className="cursor-pointer flex flex-col items-center space-y-2"
-                    >
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                        {formData.type === "image" ? (
-                          <ImageIcon className="w-6 h-6 text-gray-400" />
-                        ) : (
-                          <Video className="w-6 h-6 text-gray-400" />
+                <div className="space-y-4">
+                  {formData.type === "video" ? (
+                    // Video file upload dengan warning
+                    <>
+                      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-sm text-yellow-800 font-medium mb-2">⚠️ Perhatian Upload Video File</p>
+                        <ul className="text-xs text-yellow-700 space-y-1 list-disc list-inside">
+                          <li>Video disimpan di localStorage browser (persisten)</li>
+                          <li>Untuk video besar, gunakan metode "URL Video" (YouTube/Vimeo)</li>
+                          <li>Max file size: 20MB</li>
+                          <li>Untuk file lebih besar, gunakan backend API dengan cloud storage</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="videoFile">Upload Video File *</Label>
+                        <div 
+                          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
+                          onDragOver={handleDragOver}
+                          onDrop={handleDrop}
+                        >
+                          <input
+                            type="file"
+                            id="videoFile"
+                            accept="video/mp4,video/webm,video/ogg"
+                            onChange={handleFileChange}
+                            className="sr-only"
+                          />
+                          <label 
+                            htmlFor="videoFile" 
+                            className="cursor-pointer flex flex-col items-center space-y-2 w-full h-full"
+                          >
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                              <Video className="w-6 h-6 text-gray-400" />
+                            </div>
+                            <div className="text-sm text-center">
+                              <span className="font-medium text-primary">Klik untuk upload video</span>
+                              <p className="text-gray-500">atau drag & drop file di sini</p>
+                            </div>
+                          </label>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          🎥 Format: MP4, WEBM, OGG | Maksimal: 20MB
+                        </p>
+                        
+                        {/* Video Preview */}
+                        {formData.url && (
+                          <div className="mt-2 p-3 border rounded-lg bg-gray-50">
+                            <div className="space-y-2">
+                              <video 
+                                src={formData.url} 
+                                controls 
+                                className="w-full rounded-lg max-h-48"
+                              />
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-green-600 font-medium">
+                                  ✅ Video berhasil diupload
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData(prev => ({ ...prev, url: "", thumbnail: "" }))}
+                                  className="text-xs text-red-600 hover:underline"
+                                >
+                                  🗑️ Hapus video
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         )}
                       </div>
-                      <div className="text-sm text-center">
-                        <span className="font-medium text-primary">Klik untuk upload</span>
-                        <p className="text-gray-500">atau drag & drop file di sini</p>
-                      </div>
-                    </label>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formData.type === "image" 
-                      ? "📷 Format: JPG, PNG, GIF, WEBP | Maksimal: 10MB"
-                      : "🎥 Format: MP4, WEBM, OGG | Maksimal: 10MB"}
-                  </p>
-                  
-                  {/* Preview */}
-                  {formData.thumbnail && (
-                    <div className="mt-2 p-3 border rounded-lg bg-gray-50">
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={formData.thumbnail}
-                          alt="Preview"
-                          className="w-20 h-20 object-cover rounded-lg"
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm text-green-600 font-medium">
-                            ✅ File berhasil diupload
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, thumbnail: "" }))}
-                            className="text-xs text-red-600 hover:underline mt-1"
+
+                      {/* Thumbnail for video */}
+                      <div className="space-y-2">
+                        <Label htmlFor="videoThumbnail">Upload Thumbnail (Opsional)</Label>
+                        <div 
+                          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
+                          onDragOver={handleDragOver}
+                          onDrop={handleDrop}
+                        >
+                          <input
+                            type="file"
+                            id="videoThumbnail"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="sr-only"
+                          />
+                          <label 
+                            htmlFor="videoThumbnail" 
+                            className="cursor-pointer flex flex-col items-center space-y-2 w-full h-full"
                           >
-                            🗑️ Hapus file
-                          </button>
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                              <ImageIcon className="w-6 h-6 text-gray-400" />
+                            </div>
+                            <div className="text-sm text-center">
+                              <span className="font-medium text-primary">Klik untuk upload thumbnail</span>
+                              <p className="text-gray-500">atau gunakan auto-thumbnail dari video</p>
+                            </div>
+                          </label>
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          📷 Format: JPG, PNG, GIF, WEBP | Maksimal: 5MB
+                        </p>
+                        
+                        {/* Thumbnail Preview */}
+                        {formData.thumbnail && (
+                          <div className="mt-2 p-3 border rounded-lg bg-gray-50">
+                            <div className="flex items-center space-x-3">
+                              <img
+                                src={formData.thumbnail}
+                                alt="Thumbnail"
+                                className="w-20 h-20 object-cover rounded-lg"
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm text-green-600 font-medium">
+                                  ✅ Thumbnail berhasil diupload
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData(prev => ({ ...prev, thumbnail: "" }))}
+                                  className="text-xs text-red-600 hover:underline mt-1"
+                                >
+                                  🗑️ Hapus thumbnail
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
+                    </>
+                  ) : (
+                    // Image upload (original)
+                    <div className="space-y-2">
+                      <Label htmlFor="file">Upload Foto *</Label>
+                      <div 
+                        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                      >
+                        <input
+                          type="file"
+                          id="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="sr-only"
+                        />
+                        <label 
+                          htmlFor="file" 
+                          className="cursor-pointer flex flex-col items-center space-y-2 w-full h-full"
+                        >
+                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                            <ImageIcon className="w-6 h-6 text-gray-400" />
+                          </div>
+                          <div className="text-sm text-center">
+                            <span className="font-medium text-primary">Klik untuk upload</span>
+                            <p className="text-gray-500">atau drag & drop file di sini</p>
+                          </div>
+                        </label>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        📷 Format: JPG, PNG, GIF, WEBP | Maksimal: 5MB
+                      </p>
+                      
+                      {/* Loading State */}
+                      {isUploading && (
+                        <div className="mt-2 p-4 border rounded-lg bg-blue-50 flex items-center space-x-3">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                          <p className="text-sm text-primary font-medium">Mengupload file...</p>
+                        </div>
+                      )}
+                      
+                      {/* Preview */}
+                      {!isUploading && formData.thumbnail && (
+                        <div className="mt-2 p-3 border rounded-lg bg-gray-50">
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={formData.thumbnail}
+                              alt="Preview"
+                              className="w-20 h-20 object-cover rounded-lg"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm text-green-600 font-medium">
+                                ✅ File berhasil diupload
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, thumbnail: "" }))}
+                                className="text-xs text-red-600 hover:underline mt-1"
+                              >
+                                🗑️ Hapus file
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -757,14 +948,14 @@ export default function GalleryManagement() {
                     >
                       <input
                         type="file"
-                        id="videoThumbnail"
+                        id="videoThumbnailUrl"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="hidden"
+                        className="sr-only"
                       />
                       <label 
-                        htmlFor="videoThumbnail" 
-                        className="cursor-pointer flex flex-col items-center space-y-2"
+                        htmlFor="videoThumbnailUrl" 
+                        className="cursor-pointer flex flex-col items-center space-y-2 w-full h-full"
                       >
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                           <ImageIcon className="w-6 h-6 text-gray-400" />

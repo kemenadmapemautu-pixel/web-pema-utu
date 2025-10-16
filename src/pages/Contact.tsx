@@ -179,30 +179,30 @@ export default function Contact() {
   ];
 
   return (
-    <div className="min-h-screen py-20">
+    <div className="min-h-screen py-16 md:py-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center space-y-4 mb-16">
-          <h1 className="text-4xl lg:text-5xl font-bold text-primary">
+        <div className="text-center space-y-3 mb-10">
+          <h1 className="text-3xl lg:text-4xl font-bold text-primary">
             Hubungi <span className="text-gradient-accent">Kami</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
             Kami siap mendengar aspirasi, saran, dan masukan Anda. Jangan ragu untuk menghubungi kami kapan saja.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-2xl text-primary flex items-center">
-                  <Send className="h-6 w-6 mr-3 text-gold" />
+                <CardTitle className="text-xl text-primary flex items-center">
+                  <Send className="h-5 w-5 mr-2 text-gold" />
                   Kirim Pesan
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Nama Lengkap</Label>
@@ -295,22 +295,22 @@ export default function Contact() {
             {/* Contact Details */}
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-xl text-primary">Informasi Kontak</CardTitle>
+                <CardTitle className="text-lg text-primary">Informasi Kontak</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
                 {contactInfo.map((info, index) => {
                   const Icon = info.icon;
                   return (
-                    <div key={index} className="space-y-2">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
-                          <Icon className="h-5 w-5 text-white" />
+                    <div key={index} className="space-y-1.5">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-9 h-9 gradient-primary rounded-lg flex items-center justify-center">
+                          <Icon className="h-4 w-4 text-white" />
                         </div>
-                        <h3 className="font-semibold text-primary">{info.title}</h3>
+                        <h3 className="text-sm font-semibold text-primary">{info.title}</h3>
                       </div>
-                      <div className="ml-13 space-y-1">
+                      <div className="ml-11 space-y-0.5">
                         {info.details.map((detail, idx) => (
-                          <p key={idx} className="text-sm text-foreground">{detail}</p>
+                          <p key={idx} className="text-xs text-foreground">{detail}</p>
                         ))}
                         <p className="text-xs text-muted-foreground">{info.description}</p>
                       </div>
@@ -323,16 +323,16 @@ export default function Contact() {
             {/* Departments */}
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-xl text-primary">Departemen</CardTitle>
+                <CardTitle className="text-lg text-primary">Departemen</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {departments.map((dept, index) => {
                   const Icon = dept.icon;
                   return (
-                    <div key={index} className="p-4 border border-border rounded-lg hover:border-gold transition-smooth">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Icon className="h-4 w-4 text-white" />
+                    <div key={index} className="p-3 border border-border rounded-lg hover:border-gold transition-smooth">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-7 h-7 gradient-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-3.5 w-3.5 text-white" />
                         </div>
                         <div className="space-y-1">
                           <h4 className="font-semibold text-primary text-sm">{dept.name}</h4>
@@ -354,11 +354,11 @@ export default function Contact() {
         </div>
 
         {/* Map Section */}
-        <div className="mt-16">
+        <div className="mt-12">
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary flex items-center">
-                <MapPin className="h-6 w-6 mr-3 text-gold" />
+              <CardTitle className="text-xl text-primary flex items-center">
+                <MapPin className="h-5 w-5 mr-2 text-gold" />
                 Lokasi Kami
               </CardTitle>
             </CardHeader>
@@ -375,10 +375,10 @@ export default function Contact() {
                   title="Lokasi Sekretariat Pema UTU"
                 ></iframe>
               </div>
-              <div className="mt-4 text-center space-y-2">
-                <p className="text-lg font-semibold text-primary">Sekretariat Pema UTU</p>
-                <p className="text-muted-foreground">Gedung Lama, Samping Paud/Tk Lentera Teuku Umar</p>
-                <p className="text-muted-foreground">Universitas Teuku Umar</p>
+              <div className="mt-4 text-center space-y-1">
+                <p className="text-base font-semibold text-primary">Sekretariat Pema UTU</p>
+                <p className="text-sm text-muted-foreground">Gedung Lama, Samping Paud/Tk Lentera Teuku Umar</p>
+                <p className="text-sm text-muted-foreground">Universitas Teuku Umar</p>
               </div>
             </CardContent>
           </Card>

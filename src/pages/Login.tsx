@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn, Lock, User } from "lucide-react";
+import { LogIn, Lock, User, Mail } from "lucide-react";
+import { isSupabaseEnabled } from "@/lib/supabase";
 
 export default function Login() {
   const [credentials, setCredentials] = useState({
@@ -16,24 +17,38 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, loginWithSupabase } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulasi login
-    setTimeout(() => {
-      let user = null;
+    try {
+      // Try Supabase login first if configured
+      if (isSupabaseEnabled()) {
+        const result = await loginWithSupabase(credentials.username, credentials.password);
+        
+        if (result.success && result.user) {
+          toast({
+            title: "Login Berhasil! ✅",
+            description: `Selamat datang, ${result.user.name} (${result.user.role})`,
+          });
+          navigate("/admin/dashboard");
+          return;
+        } else if (result.error && !result.error.includes("Supabase not configured")) {
+          // If not a config error, try localStorage fallback
+          console.log("Supabase login failed, trying localStorage fallback...");
+        }
+      }
 
-      // Cek akun dari localStorage (dibuat oleh populate atau admin)
+      // Fallback to localStorage
       const accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
       const foundAccount = accounts.find((acc: any) => 
         acc.username === credentials.username && acc.password === credentials.password
       );
 
       if (foundAccount) {
-        user = {
+        const user = {
           username: foundAccount.username,
           name: foundAccount.name,
           role: foundAccount.role,
@@ -41,10 +56,7 @@ export default function Login() {
           position: foundAccount.position,
           department: foundAccount.department
         };
-      }
 
-      if (user) {
-        // Use AuthContext login function
         login(user);
         
         toast({
@@ -52,25 +64,24 @@ export default function Login() {
           description: `Selamat datang, ${user.name} (${user.role})`,
         });
         
-        // Redirect berdasarkan role
-        if (user.role === "admin") {
-          navigate("/admin/dashboard");
-        } else if (user.role === "pimpinan") {
-          navigate("/admin/dashboard");
-        } else if (user.role === "menteri") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/admin/dashboard");
-        }
+        navigate("/admin/dashboard");
       } else {
         toast({
           title: "Login Gagal",
-          description: "Username atau password salah. Pastikan akun sudah dibuat oleh admin.",
+          description: "Email/Username atau password salah.",
           variant: "destructive"
         });
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat login.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,14 +114,14 @@ export default function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Email atau Username</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="username"
                     name="username"
                     type="text"
-                    placeholder="Masukkan username"
+                    placeholder="Email atau Username"
                     value={credentials.username}
                     onChange={handleChange}
                     className="pl-10"
@@ -156,8 +167,10 @@ export default function Login() {
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
               <p className="text-sm font-semibold mb-2 text-blue-900 dark:text-blue-100">🔐 Informasi Login</p>
               <div className="text-xs space-y-2 text-blue-700 dark:text-blue-300">
-                <p>Gunakan username dan password yang telah diberikan oleh admin.</p>
-                <p className="text-[10px] italic">Jika lupa kredensial, hubungi administrator PEMA UTU.</p>
+                <p><strong>Admin Default:</strong></p>
+                <p>Email: <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">pemautusamgrahita@gmail.com</code></p>
+                <p>Password: <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">Luckystrike26</code></p>
+                <p className="text-[10px] italic mt-2">Atau gunakan username: adminpemautu</p>
               </div>
             </div>
           </CardContent>

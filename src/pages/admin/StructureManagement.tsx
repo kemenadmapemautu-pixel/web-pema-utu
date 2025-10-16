@@ -46,31 +46,45 @@ export default function StructureManagement() {
   const [tempConfig, setTempConfig] = useState<StructureConfig>(config);
 
   useEffect(() => {
-    // Load config from localStorage
-    const savedConfig = localStorage.getItem("structureConfig");
-    if (savedConfig) {
-      const parsed = JSON.parse(savedConfig);
-      setConfig(parsed);
-      setTempConfig(parsed);
+    // Load config from localStorage with error handling
+    try {
+      const savedConfig = localStorage.getItem("structureConfig");
+      if (savedConfig) {
+        const parsed = JSON.parse(savedConfig);
+        setConfig(parsed);
+        setTempConfig(parsed);
+      }
+    } catch (error) {
+      console.error("Error loading structure config:", error);
+      // Continue with default config
     }
   }, []);
 
   const handleSave = () => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-    const updatedConfig = {
-      ...tempConfig,
-      updatedAt: new Date().toISOString(),
-      updatedBy: currentUser.name || "Admin"
-    };
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+      const updatedConfig = {
+        ...tempConfig,
+        updatedAt: new Date().toISOString(),
+        updatedBy: currentUser.name || "Admin"
+      };
 
-    localStorage.setItem("structureConfig", JSON.stringify(updatedConfig));
-    setConfig(updatedConfig);
-    setIsEditing(false);
+      localStorage.setItem("structureConfig", JSON.stringify(updatedConfig));
+      setConfig(updatedConfig);
+      setIsEditing(false);
 
-    toast({
-      title: "Berhasil",
-      description: "Konfigurasi struktur organisasi berhasil diperbarui",
-    });
+      toast({
+        title: "Berhasil",
+        description: "Konfigurasi struktur organisasi berhasil diperbarui",
+      });
+    } catch (error) {
+      console.error("Error saving structure config:", error);
+      toast({
+        title: "Error",
+        description: "Gagal menyimpan konfigurasi",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancel = () => {
