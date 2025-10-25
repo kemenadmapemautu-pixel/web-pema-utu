@@ -258,54 +258,63 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-gold/5">
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <LayoutDashboard className="h-8 w-8 text-gold" />
-              <div>
-                <h1 className="text-2xl font-bold text-primary">
+      {/* Header - Responsive */}
+      <div className="bg-white border-b shadow-sm sticky top-0 z-40">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            {/* Logo & Title */}
+            <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+              <LayoutDashboard className="h-6 w-6 sm:h-8 sm:w-8 text-gold flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary truncate">
                   Dashboard {isAdmin() ? "Admin" : currentUser?.role === "pimpinan" ? "Pimpinan" : "Menteri"}
                 </h1>
-                <p className="text-sm text-muted-foreground">PEMA UTU - Kabinet Samgrahita</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">PEMA UTU - Kabinet Samgrahita</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="font-semibold text-primary">{currentUser?.name}</p>
-                <p className="text-sm text-muted-foreground">{currentUser?.role}</p>
+            
+            {/* User Info & Logout - Responsive */}
+            <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+              <div className="text-left sm:text-right min-w-0 flex-1 sm:flex-none">
+                <p className="font-semibold text-primary text-sm sm:text-base truncate">{currentUser?.name}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground capitalize">{currentUser?.role}</p>
               </div>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleLogout}
+                className="flex-shrink-0 text-xs sm:text-sm"
+              >
+                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Logout</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
+      {/* Main Content - Responsive */}
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12">
 
-        {/* Profile Completion Alert for Non-Admin */}
+        {/* Profile Completion Alert for Non-Admin - Responsive */}
         {!isAdmin() && !profileCompleted && (
-          <Card className="mb-8 shadow-lg border-t-4 border-t-orange-500 bg-orange-50">
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                  <Settings className="h-6 w-6 text-white" />
+          <Card className="mb-6 sm:mb-8 shadow-lg border-t-4 border-t-orange-500 bg-orange-50">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-orange-800 mb-1">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base sm:text-lg font-bold text-orange-800 mb-1">
                     🚨 Profil Belum Lengkap
                   </h3>
-                  <p className="text-orange-700 text-sm mb-3">
+                  <p className="text-orange-700 text-xs sm:text-sm mb-3">
                     Lengkapi profil Anda agar dapat tampil di website PEMA UTU dengan baik.
                   </p>
                   <Button 
                     onClick={() => navigate("/admin/profile")}
-                    className="bg-orange-600 hover:bg-orange-700"
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-xs sm:text-sm"
                   >
                     Lengkapi Profil Sekarang
                   </Button>
@@ -315,13 +324,13 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Welcome Card */}
-        <Card className="mb-8 shadow-lg border-t-4 border-t-gold">
-          <CardContent className="pt-6">
-            <h2 className="text-2xl font-bold text-primary mb-2">
+        {/* Welcome Card - Responsive */}
+        <Card className="mb-6 sm:mb-8 shadow-lg border-t-4 border-t-gold">
+          <CardContent className="pt-4 sm:pt-6">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary mb-2">
               Selamat Datang, {currentUser?.name}! 👋
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base">
               {isAdmin() 
                 ? "Kelola pengurus, akun, berita, dan seluruh konten PEMA UTU dengan mudah melalui dashboard terpadu ini."
                 : profileCompleted 
@@ -332,26 +341,26 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Menu Grid - Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Card 
                 key={index}
-                className="shadow-card hover:shadow-primary transition-all cursor-pointer group"
+                className="shadow-card hover:shadow-primary transition-all cursor-pointer group h-full"
                 onClick={() => navigate(item.path)}
               >
-                <CardHeader>
-                  <div className={`w-12 h-12 ${item.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className="h-6 w-6 text-white" />
+                <CardHeader className="pb-3">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 ${item.color} rounded-lg flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <CardTitle className="text-lg group-hover:text-gold transition-colors">
+                  <CardTitle className="text-base sm:text-lg group-hover:text-gold transition-colors line-clamp-2">
                     {item.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
+                <CardContent className="pt-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
                     {item.description}
                   </p>
                 </CardContent>

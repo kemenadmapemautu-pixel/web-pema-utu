@@ -36,6 +36,8 @@ import StorageManagement from '@/pages/admin/StorageManagement';
 import ProfileEdit from '@/pages/admin/ProfileEdit';
 import ActivitiesManagement from '@/pages/admin/ActivitiesManagement';
 import ActivityForm from '@/components/ActivityForm';
+import UserManagement from '@/pages/admin/UserManagement';
+import CreateAccount from '@/pages/admin/CreateAccount';
 
 function App() {
   return (
@@ -78,6 +80,8 @@ function App() {
             <Route path="/admin/activities" element={<ActivitiesManagement />} />
             <Route path="/admin/activities/new" element={<ActivityForm />} />
             <Route path="/admin/activities/edit/:id" element={<ActivityForm />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/create-account" element={<CreateAccount />} />
           </Routes>
         </Router>
         <Toaster />
